@@ -64,6 +64,9 @@ end
 
 if $0 == __FILE__
 
-  p Sentifi.fetch_token
+  p Time.now
+  t = Sentifi.fetch_token
+  pp t.to_h
+  p [ t.expires_in / 3600 / 24, :days ]
 end
 
