@@ -1,4 +1,11 @@
 
+.vimrc
+.viminfo
+.vimgrep
+#.vimshorts
+.vimmarks
+.vimspec
+
 .bxsinfo.yaml
 .rspec.out
 
