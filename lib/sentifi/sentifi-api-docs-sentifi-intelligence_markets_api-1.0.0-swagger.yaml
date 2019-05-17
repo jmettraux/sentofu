@@ -1,0 +1,565 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: Sentifi Intelligence - Markets API
+  description: |
+    Markets module API documentation
+tags:
+  - name: Top Theme
+    description: |
+      Get a list of top X themes sorted by attention.
+  - name: Region Asset Insights
+    description: >
+      Get a list of regions for a specific time frame that we selected. For each
+      region, there will
+
+      be corresponding data regarding sentiment score, sentiment label,
+      sentiment change, asset allocation
+
+      shift and shift change for the time period selected. The time period
+      selected should be full month(s),
+
+      for example: last month, last 2 months, last 3 months.
+  - name: Marketcap Asset Insights
+    description: >
+      Get a list of market cap groups and corresponding asset allocation shift
+      data for a specific
+
+      time frame that we selected. The time period selected should be full
+      month(s), for example:
+
+      last month, last 2 months, last 3 months.
+  - name: Investor Type Asset Insights
+    description: >
+      Get asset allocation shift and sentiment score for each investor type
+      within selected sector(s)
+  - name: Asset Stock Trend
+    description: >
+      Get a list of stocks with the largest positive and negative asset
+      allocation change and
+
+      corresponding asset allocation shift and sentiment change.
+servers:
+  - url: 'https://apis.sentifi.com/v1/intelligence/markets'
+paths:
+  /top-theme:
+    get:
+      tags:
+        - Top Theme
+      summary: Get a list of top X themes sorted by attention.
+      x-files:
+        - >-
+          https://drive.google.com/uc?export=view&id=1EL4ssvL_ExFNomNXR8hp1EuIKPQuBA5h&__type=.png
+        - >-
+          https://drive.google.com/uc?export=view&id=1JEnEwv-YMI98FqjBoWWDN_3G0sVfnUGM&__type=.png
+      description: >-
+        Depending on filters, this API will return list of top x themes sorted
+        by attention
+
+
+        More information can be found here:
+
+
+        https://sentifi.atlassian.net/wiki/spaces/MARK/pages/327221260/Themes+Product+Requirements
+      parameters:
+        - name: size
+          in: query
+          description: number of results
+          schema:
+            type: number
+            default: 10
+        - $ref: '#/components/parameters/dateStart'
+        - $ref: '#/components/parameters/dateEnd'
+        - name: country-codes
+          in: query
+          description: |-
+            List of comma separated ISO alpha 2 country codes
+            https://www.nationsonline.org/oneworld/country_code_list.htm
+          required: false
+          schema:
+            type: string
+        - name: industry-ids
+          in: query
+          description: List of comma separated industry IDs
+          required: false
+          schema:
+            type: number
+            format: int64
+        - name: sector-ids
+          in: query
+          description: List of comma separated sector IDs
+          required: false
+          schema:
+            type: number
+            format: int64
+        - name: region-ids
+          in: query
+          description: List of comma separated region IDs
+          required: false
+          schema:
+            type: number
+            format: int64
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponseSuccess'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          themeInfo:
+                            $ref: '#/components/schemas/ThemeInfo'
+        default:
+          description: error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseError'
+  /asset/insight/region:
+    get:
+      tags:
+        - Region Asset Insights
+      summary: >-
+        Get a list of regions and corresponding asset allocation shift and
+        sentiment data
+      description: >-
+        - This API returns a list of regions for a specific time frame that we
+        selected. For each region, there will be corresponding data regarding
+        sentiment score, sentiment label, sentiment change, asset allocation
+        shift and shift change for the time period selected
+
+          The time period selected should be full month(s), for example: lastmonth, last2months, last3months
+
+          More information can be found here:
+
+          https://docs.google.com/document/d/1aSwjxKnjLsRH1Decw--BRSaEbK7iY0Zwt79aQvfF2fQ/edit
+      parameters:
+        - $ref: '#/components/parameters/period'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponseSuccess'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            regionInfo:
+                              type: object
+                              properties:
+                                id:
+                                  type: number
+                                  format: int
+                                  example: 1
+                                  description: Internal region identification
+                                name:
+                                  type: string
+                                  example: Asia Developed
+                                  description: >-
+                                    Region name, corresponding to each region
+                                    identification
+                            allocation:
+                              $ref: '#/components/schemas/Allocation'
+                            sentiment:
+                              $ref: '#/components/schemas/Sentiment'
+        default:
+          description: error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseError'
+  /asset/insight/marketcap:
+    get:
+      tags:
+        - Marketcap Asset Insights
+      summary: >-
+        Get asset allocation shift and sentiment score for each investor type
+        within selected sector(s)
+      description: >-
+        - This API returns a list of market cap groups and corresponding asset
+        allocation shift data for a specific time frame that we selected.
+
+          The time period selected should be full month(s), for example: lastmonth, last2months, last3months
+
+          More information can be found here:
+
+          https://docs.google.com/document/d/1aSwjxKnjLsRH1Decw--BRSaEbK7iY0Zwt79aQvfF2fQ/edit
+      parameters:
+        - $ref: '#/components/parameters/period'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponseSuccess'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            marketCapLabel:
+                              type: object
+                              properties:
+                                id:
+                                  type: string
+                                  example: small
+                                  description: The label of market cap
+                                name:
+                                  type: string
+                                  example: Asia Developed
+                                  description: Name of market cap
+                            allocation:
+                              $ref: '#/components/schemas/Allocation'
+        default:
+          description: error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseError'
+  /asset/insight/investor-type:
+    get:
+      tags:
+        - Investor Type Asset Insights
+      summary: >-
+        Get asset allocation shift and sentiment score for each investor type
+        within selected sector(s)
+      description: >-
+        The API will return asset allocation shift and sentiment score for each
+        investor type within selected sector(s)
+
+          More information can be found here:
+
+          https://docs.google.com/document/d/1aSwjxKnjLsRH1Decw--BRSaEbK7iY0Zwt79aQvfF2fQ/edit
+      parameters:
+        - name: sector-ids
+          in: query
+          description: 'one or a list of sector ids separated by `,`'
+          schema:
+            type: number
+            format: int64
+          required: true
+        - $ref: '#/components/parameters/period'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponseSuccess'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            sectorInfo:
+                              type: object
+                              properties:
+                                id:
+                                  type: number
+                                  format: int
+                                  example: 1401
+                                  description: Internal sector identification
+                                name:
+                                  type: string
+                                  example: Consumer Cyclical
+                                  description: Sector name
+                            investorTypes:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  investorTypeInfo:
+                                    type: object
+                                    properties:
+                                      id:
+                                        type: string
+                                        example: MF
+                                        description: Internal investor type identification
+                                      name:
+                                        type: string
+                                        example: Mutual Fund Manager
+                                        description: Investor type name
+                                  allocation:
+                                    $ref: '#/components/schemas/Allocation'
+                                  sentiment:
+                                    $ref: '#/components/schemas/Sentiment'
+        default:
+          description: error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseError'
+  /asset/stock/trend:
+    get:
+      tags:
+        - Asset Stock Trend
+      summary: Get stocks with the largest positive or negative asset allocation change
+      description: >-
+        This API gets stocks with the largest positive and negative asset
+        allocation change and corresponding asset allocation shift and sentiment
+        change
+
+          More information can be found here:
+
+          https://docs.google.com/document/d/1aSwjxKnjLsRH1Decw--BRSaEbK7iY0Zwt79aQvfF2fQ/edit
+      parameters:
+        - $ref: '#/components/parameters/period'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponseSuccess'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            inflows:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  stockInfo:
+                                    $ref: '#/components/schemas/stockInfo'
+                                  sectorInfo:
+                                    $ref: '#/components/schemas/sectorInfo'
+                                  allocation:
+                                    $ref: '#/components/schemas/Allocation'
+                                  sentiment:
+                                    $ref: '#/components/schemas/Sentiment'
+                            outflows:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  stockInfo:
+                                    $ref: '#/components/schemas/stockInfo'
+                                  sectorInfo:
+                                    $ref: '#/components/schemas/sectorInfo'
+                                  allocation:
+                                    $ref: '#/components/schemas/Allocation'
+                                  sentiment:
+                                    $ref: '#/components/schemas/Sentiment'
+        default:
+          description: error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseError'
+security:
+  - BearerAuth: []
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+  schemas:
+    Sentiment:
+      type: object
+      properties:
+        value:
+          type: number
+          format: float
+          example: 57
+          description: Sentiment score value aggregated by region
+        label:
+          type: string
+          enum:
+            - positive
+            - negative
+            - neutral
+          description: The label of sentiment score
+        valueChange:
+          type: number
+          format: int64
+          example: -3
+          description: Change in sentiment score
+    Allocation:
+      type: object
+      properties:
+        value:
+          type: number
+          format: float
+          example: 0.062
+          description: >
+            Percentage of funding investment in a specific region in current
+            month.
+
+            E.g: period=lastmonth, current time is 9/5/2019, there are 10 funds
+            investing in region
+
+            Asia Developed. The allocation value would be amount of funding
+            investment of 10 funds in
+
+            region Asia Developed devided by total amount of funding investment
+            of 10 funds in April 2019.
+        valueChange:
+          type: number
+          format: int64
+          example: 0.00631
+          description: Percentage change (shift) in funding investment
+    ThemeInfo:
+      type: object
+      properties:
+        id:
+          type: number
+          format: int64
+          example: 85
+          description: Impact seq id of the event in Sentifi system
+        name:
+          type: string
+          example: Clean Tech
+          description: Name of theme
+        attention:
+          type: number
+          format: float
+          description: Number of topic messages related to that theme
+    ApiResponseSuccess:
+      type: object
+      properties:
+        data:
+          type: object
+        extra:
+          type: object
+          properties:
+            updatedTime:
+              type: string
+              format: date-time
+              description: Date and time when the query was executed in UTC
+    stockInfo:
+      type: object
+      properties:
+        id:
+          type: number
+          format: int64
+          example: 1831982
+          description: Id of the topic
+        name:
+          type: string
+          example: Makpetrol AD
+          description: Legal name
+        ticker:
+          type: string
+          example: MPT
+          description: Ticker symbol of topic
+    ApiResponseError:
+      type: object
+      properties:
+        extra:
+          type: object
+          properties:
+            updatedTime:
+              type: string
+              format: date-time
+            errorCode:
+              type: integer
+            errorMessage:
+              type: string
+    sectorInfo:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1403
+          description: Internal sector identification
+        name:
+          type: string
+          example: Energy
+          description: Sector name
+  parameters:
+    timeframe:
+      in: query
+      name: timeframe
+      description: >-
+        data's timeframe in previous x day(s). Following the requirement in
+        ticket [INSNEW-6](https://sentifi.atlassian.net/browse/INSNEW-6)
+      schema:
+        type: integer
+        enum:
+          - 1
+          - 7
+          - 30
+          - 90
+          - 180
+          - 365
+          - 730
+          - 1095
+    timeSeriesFormat:
+      in: query
+      name: tsf
+      schema:
+        type: string
+        enum:
+          - series
+          - endpoints
+        default: endpoints
+      description: >-
+        timebased data list return from the api can be retreived as series or 2
+        endpoints (start & end). Eg. when timeframe is 7day, with SERIES format
+        it would return 7 data points, with ENDPOINTS it would return 2 data
+        points (recent and last 7day data point).
+    language:
+      in: query
+      name: lang
+      schema:
+        type: string
+        enum:
+          - en
+          - de
+        default: en
+    dateStart:
+      in: query
+      name: start-date
+      schema:
+        type: string
+      description: date value in format `YYYY-MM-DD`
+      required: true
+    movingAvarage:
+      in: query
+      name: moving-average
+      schema:
+        type: number
+      description: |
+        If we don't set this param, the default moving average would be used as
+
+        * For a time period of < 5 = default SMA for price: 1
+        * For a time period of ≥ one week, < 1 month = default SMA for price: 5
+        * For a time period of ≥ 1 month, < 2 month = default SMA for price: 20
+        * For a time period of ≥ 2 month = default SMA for price: 50
+    dateEnd:
+      in: query
+      name: end-date
+      schema:
+        type: string
+      description: date value in format `YYYY-MM-DD`
+      required: true
+    period:
+      in: query
+      name: period
+      schema:
+        type: string
+      description: 'period of time (ex:lastmonth, last2months)'
+      required: true
