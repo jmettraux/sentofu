@@ -2,6 +2,7 @@
 .bxsinfo.yaml
 .rspec.out
 
+Gemfile.lock
 .ruby-version
 
 .sentifi-credentials.yaml
