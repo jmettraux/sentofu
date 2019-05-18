@@ -40,5 +40,12 @@ test: spec
 
 ## specific to project ##
 
-.PHONY: count_lines scan gemspec_validate name cw build push spec
+fetch_apis:
+	curl https://api.swaggerhub.com/apis/sentifi-api-docs/sentifi-intelligence_company_api/1.0.0/swagger.yaml > api_company.yaml
+	curl https://api.swaggerhub.com/apis/sentifi-api-docs/sentifi-intelligence_markets_api/1.0.0/swagger.yaml > api_markets.yaml
+
+
+## done ##
+
+.PHONY: count_lines scan gemspec_validate name cw build push spec fetch_apis
 
