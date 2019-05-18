@@ -1,6 +1,5 @@
 
 require 'json'
-require 'yaml'
 require 'base64'
 require 'ostruct'
 require 'net/http'
@@ -13,9 +12,15 @@ module Sentofu
 
   VERSION = '0.1.0'
 
-  Dir[File.join(__dir__, 'sentofu/sentifi-*.yaml')].each do |fpath|
+# TODO read local if SENTOFU_API_SPEC_DIR present
+  %w[ company markets ].each do |api_name|
 
-    Sentofu::Api.make(YAML.load(File.read(fpath)))
+    api_spec = JSON.parse(
+      Sentofu::Http.get(
+	    "https://api.swaggerhub.com/apis/sentifi-api-docs/" +
+        "sentifi-intelligence_#{api_name}_api/1.0.0/"))
+
+    Sentofu::Api.make(api_spec)
   end
 end
 

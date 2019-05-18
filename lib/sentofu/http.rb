@@ -27,7 +27,33 @@ module Sentofu
         OpenStruct.new(JSON.parse(res.body))
       end
 
+      def get(uri)
+
+        u = URI(uri)
+        res = make_http(u).request(make_get_req(u))
+
+        res.body
+      end
+
       protected
+
+      def make_http(uri)
+
+        t = Net::HTTP.new(uri.host, uri.port)
+        t.use_ssl = (uri.scheme == 'https')
+
+        t
+      end
+
+      def make_get_req(uri)
+
+        req = Net::HTTP::Get.new(uri.path)
+        #def req.set_header(k, v); @header[k] = [ v ]; end
+        req.add_field('Content-Type', 'application/json')
+        #req.add_field('Authorization', a)
+
+        req
+      end
 
       def request(req)
 
