@@ -13,6 +13,8 @@
 Gemfile.lock
 .ruby-version
 
+pkg/
+
 .sentifi-credentials.yaml
 
 
