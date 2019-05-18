@@ -48,8 +48,10 @@ module Sentofu
       def make_get_req(uri)
 
         req = Net::HTTP::Get.new(uri.path)
-        #def req.set_header(k, v); @header[k] = [ v ]; end
-        req.add_field('Content-Type', 'application/json')
+        def req.set_header(k, v); @header[k] = [ v ]; end
+
+        req.set_header('User-Agent', "Sentofu #{Sentofu::VERSION}")
+        req.set_header('Content-Type', 'application/json')
         #req.add_field('Authorization', a)
 
         req
