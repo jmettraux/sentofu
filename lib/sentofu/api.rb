@@ -3,45 +3,48 @@ module Sentofu
 
   class Resource
 
-    attr_reader :name
+    attr_reader :parent, :segment
 
-    def initialize(parent, name, point)
+    def initialize(parent, segment)
 
       @parent = parent
-      @name = name
-      #@point = point
+      @segment = segment
+      @children = {}
     end
 
-    def add_path(path); add(path, nil); end
-    def add_point(path, point); add(path, point); end
+    def add_segment(segment)
 
-    def [](index)
-# TODO
+      m = segment.match(/\A\{([^}]+)\}\z/)
+      mth = m ? :[] : segment
+
+      return @children[mth] if @children[mth]
+
+      if mth == :[]
+        @children[:[]] = res = Sentofu::Resource.new(self, m[1])
+        define_singleton_method(:[]) { |i| res.index = i; res }
+        res
+      else
+        @children[mth] = res = Sentofu::Resource.new(self, segment)
+        define_singleton_method(mth) { res }
+        res
+      end
+    end
+
+    def add_leaf_segment(segment, point)
+
+      if m = segment.match(/\A\{([^}]+)\}\z/)
+        define_singleton_method(:[]) { |i| fetch(point, i) }
+      else
+        define_singleton_method(segment) { fetch(point, nil) }
+      end
     end
 
     protected
 
-    def add(path, point)
+    def fetch(point, index)
 
-      res = Sentofu::Resource.new(self, path.first, point)
-
-      s = (class << self; self; end)
-
-      path0 = path.first.gsub(/-/, '_')
-
-      if point
-        s.define_method(path0) { |key=nil, opts={}|
-          "nada" }
-      else
-        s.define_method(path0) { |key=nil, opts={}|
-          if path[1]
-            res[opts[path[1]]]
-          else
-            res
-          end }
-      end
-
-      res
+p [ :fetch, index ]
+fail "FETCH"
     end
   end
 
@@ -51,44 +54,23 @@ module Sentofu
 
     def initialize(spec, name)
 
-      super(nil, name, nil)
+      super(nil, nil)
 
       @spec = spec
+      @name = name
 
-puts "================== #{name}"
+#puts "================== #{name}"
       spec['paths'].each do |path, point|
 
-p path
+#p path
         re = self
-        pas = split_path(path)
-
+        pas = path.split('/').collect { |s| s.gsub(/-/, '_') }
+        pas.shift if pas.first == ''
         pas[0..-2].each do |pa|
-          re = re.add_path(pa)
+          re = re.add_segment(pa)
         end
-
-        re.add_point(pas.last, point)
+        re.add_leaf_segment(pas.last, point)
       end
-    end
-
-    protected
-
-    def split_path(path)
-
-      r = []
-
-      ps = path.split('/')[1..-1]
-      while ps.any?
-        pa = ps.shift
-        pb = ps.first
-        if m = pb && pb.match(/\A\{([^}]+)\}\z/)
-          ps.shift
-          r << [ pa, m[1] ]
-        else
-          r << [ pa ]
-        end
-      end
-
-      r
     end
 
     class << self
@@ -103,8 +85,6 @@ p path
         api = Sentofu::Api.new(api_spec, name)
         (class << Sentofu; self; end).define_method(name) { api }
       end
-
-      #protected
     end
   end
 end

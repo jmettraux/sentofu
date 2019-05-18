@@ -30,7 +30,7 @@ if $0 == __FILE__
   #y = YAML.load(File.read(File.join(File.dirname(__FILE__), 'sentifi/sentifi-api-docs-sentifi-intelligence_company_api-1.0.0-swagger.yaml')))
   #pp y['paths'].keys
 
-  p Sentofu.company.class
+  #p Sentofu.company.class
   p Sentofu.company.topic_search
   #pp Sentofu.markets
 end
