@@ -33,18 +33,48 @@ module Sentofu
     def add_leaf_segment(segment, point)
 
       if m = segment.match(/\A\{([^}]+)\}\z/)
-        define_singleton_method(:[]) { |i| fetch(point, i) }
+        define_singleton_method(:[]) { |index, query={}|
+          fetch(segment, point, index, query) }
       else
-        define_singleton_method(segment) { fetch(point, nil) }
+        define_singleton_method(segment) { |query={}|
+          fetch(segment, point, nil, query) }
       end
     end
 
     protected
 
-    def fetch(point, index)
+    def fetch(segment, point, index, query)
 
-p [ :fetch, index ]
-fail "FETCH"
+p [ :fetch, segment, '(point)', index, query ]
+p path(segment)
+#pp point
+      self.index = index if index
+
+      validate_query_parameters(point, query)
+
+nil
+    end
+
+    def path(segment=nil)
+
+      segment ||= self.segment
+      segment = segment.gsub(/_/, '-')
+
+      if parent
+        File.join(parent.send(:path), segment)
+      else
+        '/' + segment
+      end
+    end
+
+    def validate_query_parameters(point, query)
+
+      point['get']['parameters'].select { |pa| pa['in'] == 'query' }
+        .each { |pa|
+          k = (pa[:key] ||= pa['name'].gsub(/-/, '_').to_sym)
+          fail ArgumentError.new("missing query parameter #{k.inspect}") \
+            if pa['required'] == true && !query.has_key?(k) }
+pp params
     end
   end
 

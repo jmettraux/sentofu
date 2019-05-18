@@ -8,6 +8,7 @@
 
 .bxsinfo.yaml
 .rspec.out
+.errors
 
 Gemfile.lock
 .ruby-version

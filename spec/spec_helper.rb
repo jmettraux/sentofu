@@ -8,7 +8,7 @@
 require 'pp'
 #require 'ostruct'
 
-require 'sentifi'
+require 'sentofu'
 
 
 module Helpers
