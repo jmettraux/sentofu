@@ -11,7 +11,7 @@ require 'sentofu/api'
 
 module Sentofu
 
-  VERSION = '0.1.0'
+  VERSION = '0.0.1'
 
   Dir[File.join(__dir__, 'sentofu/sentifi-*.yaml')].each do |fpath|
 
