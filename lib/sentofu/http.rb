@@ -1,5 +1,5 @@
 
-module Sentifi
+module Sentofu
 
   module Http
 

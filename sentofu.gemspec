@@ -1,16 +1,16 @@
 
 Gem::Specification.new do |s|
 
-  s.name = 'sentifi'
+  s.name = 'sentofu'
 
   s.version = File.read(
-    File.expand_path('../lib/sentifi.rb', __FILE__)
+    File.expand_path('../lib/sentofu.rb', __FILE__)
   ).match(/ VERSION *= *['"]([^'"]+)/)[1]
 
   s.platform = Gem::Platform::RUBY
   s.authors = [ 'John Mettraux' ]
   s.email = [ 'jmettraux@gmail.com' ]
-  s.homepage = 'http://github.com/jmettraux/sentifi'
+  s.homepage = 'http://github.com/jmettraux/sentofu'
   s.license = 'MIT'
   s.summary = 'A Ruby client to some of the 1.0.0 Sentifi.com APIs'
 

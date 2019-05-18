@@ -1,5 +1,5 @@
 
-module Sentifi
+module Sentofu
 
   class Resource
 
@@ -23,7 +23,7 @@ module Sentifi
 
     def add(path, point)
 
-      res = Sentifi::Resource.new(self, path.first, point)
+      res = Sentofu::Resource.new(self, path.first, point)
 
       s = (class << self; self; end)
 
@@ -100,8 +100,8 @@ p path
             .gsub(/([a-z])([A-Z])/) { |_| $1 + '_' + $2.downcase }
             .gsub(/([A-Z])/) { |c| c.downcase }
 
-        api = Sentifi::Api.new(api_spec, name)
-        (class << Sentifi; self; end).define_method(name) { api }
+        api = Sentofu::Api.new(api_spec, name)
+        (class << Sentofu; self; end).define_method(name) { api }
       end
 
       #protected

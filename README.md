@@ -1,5 +1,5 @@
 
-# sentifi
+# sentofu
 
 A Ruby client to some of the 1.0.0 Sentifi.com APIs.
 
