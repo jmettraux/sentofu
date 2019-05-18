@@ -15,9 +15,23 @@ describe Sentofu::Api do
     it 'fails if a required query parameter is missing' do
 
       expect {
-        Sentofu.company.topic_search
+        Sentofu.company
+          .topic_search
       }.to raise_error(
-        ArgumentError, 'missing query parameter :keyword'
+        ArgumentError,
+        'missing query parameter :keyword'
+      )
+    end
+
+    it 'fails if an enum parameter is off' do
+
+      expect {
+        Sentofu.company
+          .topic_search(keyword: 'blah', category: 'horticulture')
+      }.to raise_error(
+        ArgumentError,
+        'value "horticulture" for :category ' +
+        'not present in ["industry", "sector", "peers"]'
       )
     end
   end

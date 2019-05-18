@@ -45,12 +45,14 @@ module Sentofu
 
     def fetch(segment, point, index, query)
 
-p [ :fetch, segment, '(point)', index, query ]
-p path(segment)
+#p [ :fetch, segment, '(point)', index, query ]
+#p path(segment)
 #pp point
       self.index = index if index
 
       validate_query_parameters(point, query)
+
+      return query if query[:debug_query]
 
 nil
     end
@@ -69,12 +71,26 @@ nil
 
     def validate_query_parameters(point, query)
 
-      point['get']['parameters'].select { |pa| pa['in'] == 'query' }
+      point['get']['parameters']
+        .select { |pa| pa['in'] == 'query' }
         .each { |pa|
+#pp pa
           k = (pa[:key] ||= pa['name'].gsub(/-/, '_').to_sym)
-          fail ArgumentError.new("missing query parameter #{k.inspect}") \
-            if pa['required'] == true && !query.has_key?(k) }
-pp params
+
+          fail ArgumentError.new(
+            "missing query parameter #{k.inspect}"
+          ) if pa['required'] == true && !query.has_key?(k)
+
+          sch = pa['schema']
+          enu = sch['enum']
+
+          v = query[k]
+          v = v.to_s if v.is_a?(Symbol)
+
+          fail ArgumentError.new(
+            "value #{v.inspect} for #{k.inspect} not present in #{enu.inspect}"
+          ) if v && enu && ! enu.include?(v)
+            }
     end
   end
 
