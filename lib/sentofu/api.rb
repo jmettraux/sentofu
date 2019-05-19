@@ -82,10 +82,19 @@ nil
           ) if pa['required'] == true && !query.has_key?(k)
 
           sch = pa['schema']
-          enu = sch['enum']
+          typ = sch['type']
 
           v = query[k]
           v = v.to_s if v.is_a?(Symbol)
+
+          fail ArgumentError.new(
+            "argument to #{k.inspect} not an integer"
+          ) if v && typ == 'integer' && ! v.is_a?(Integer)
+          fail ArgumentError.new(
+            "argument to #{k.inspect} not a string (or a symbol)"
+          ) if v && typ == 'string' && ! v.is_a?(String)
+
+          enu = sch['enum']
 
           fail ArgumentError.new(
             "value #{v.inspect} for #{k.inspect} not present in #{enu.inspect}"

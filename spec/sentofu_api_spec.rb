@@ -34,6 +34,28 @@ describe Sentofu::Api do
         'not present in ["industry", "sector", "peers"]'
       )
     end
+
+    it 'fails if a string parameter is not a string or a symbol' do
+
+      expect {
+        Sentofu.company
+          .topic_search(keyword: -1)
+      }.to raise_error(
+        ArgumentError,
+        'argument to :keyword not a string (or a symbol)'
+      )
+    end
+
+    it 'fails if an integer parameter is not an integer' do
+
+      expect {
+        Sentofu.company
+          .topic_search(keyword: 'blah', size: 'huge')
+      }.to raise_error(
+        ArgumentError,
+        'argument to :size not an integer'
+      )
+    end
   end
 end
 
