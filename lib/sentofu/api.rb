@@ -54,17 +54,16 @@ module Sentofu
 #pp point
       Thread.current.thread_variable_set(TVP + segment, index) if index
 
-      validate_query_parameters(point, query)
+      q = rectify_query_parameters(point, query)
 
       pa = File.join(path, segment)
       pa = pa.gsub(/_/, '-')
 
+      pa = pa + '?' + URI.encode_www_form(q) if q.any?
+
       return query.merge(path: pa) if query[:debug]
 
-      JSON.parse(
-        Sentofu::Http.get(
-          pa + '?' + URI.encode_www_form(query), api.token)
-            .body)
+      JSON.parse(Sentofu::Http.get(pa, api.token).body)
     end
 
     def path
@@ -81,37 +80,48 @@ module Sentofu
       end
     end
 
-    def validate_query_parameters(point, query)
+    def rectify_query_parameters(point, query)
+
+      q = query
+        .inject({}) { |h, (k, v)|
+          next h if k == :debug
+          h[k.to_s.gsub(/_/, '-')] =
+            case v
+            when Symbol then v.to_s
+            when Array then v.collect(&:to_s).join(',')
+            else v
+            end
+          h }
 
       point['get']['parameters']
-        .select { |pa| pa['in'] == 'query' }
-        .each { |pa|
-#pp pa
-          k = (pa[:key] ||= pa['name'].gsub(/-/, '_').to_sym)
+        .each { |par|
+
+          next if par['in'] != 'query'
+
+          nam = par['name']
+          key = nam.gsub(/-/, '_')
 
           fail ArgumentError.new(
-            "missing query parameter #{k.inspect}"
-          ) if pa['required'] == true && !query.has_key?(k)
+            "missing query parameter :#{key}"
+          ) if par['required'] == true && !q.has_key?(nam)
 
-          sch = pa['schema']
-          typ = sch['type']
-
-          v = query[k]
-          v = v.to_s if v.is_a?(Symbol)
+          v = q[nam]
+          typ = par['schema']['type']
 
           fail ArgumentError.new(
-            "argument to #{k.inspect} not an integer"
+            "argument to :#{key} not an integer"
           ) if v && typ == 'integer' && ! v.is_a?(Integer)
           fail ArgumentError.new(
-            "argument to #{k.inspect} not a string (or a symbol)"
+            "argument to :#{key} not a string (or a symbol)"
           ) if v && typ == 'string' && ! v.is_a?(String)
 
-          enu = sch['enum']
+          enu = par['schema']['enum']
 
           fail ArgumentError.new(
-            "value #{v.inspect} for #{k.inspect} not present in #{enu.inspect}"
-          ) if v && enu && ! enu.include?(v)
-            }
+            "value #{v.inspect} for :#{key} not present in #{enu.inspect}"
+          ) if v && enu && ! enu.include?(v) }
+
+      q
     end
 
     def api

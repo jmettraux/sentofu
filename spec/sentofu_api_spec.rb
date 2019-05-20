@@ -67,7 +67,8 @@ describe Sentofu::Api do
         r = Sentofu.company.topic_search(keyword: 'ibm', debug: true)
 
         expect(r[:path]).to eq(
-          'https://apis.sentifi.com/v1/intelligence/topic-search')
+          'https://apis.sentifi.com/v1/intelligence' +
+          '/topic-search?keyword=ibm')
       end
 
       it 'works with multiple segments' do
@@ -126,6 +127,17 @@ describe Sentofu::Api do
           r = Sentofu.company.topic[128].summary_insights
 
           expect(r['data'].first).to have_key('direction')
+        end
+      end
+
+      context '/sentiment/topic' do
+
+        it 'returns sentiments for IBM and Apple' do
+
+          r = Sentofu.company
+            .sentiment.topic(
+              topic_ids: [ 128, 579 ])
+pp r
         end
       end
     end
