@@ -3,26 +3,25 @@ module Sentofu
 
   module Http
 
-    HOST = 'apis.sentifi.com'
-
     class << self
 
       def fetch_token(credentials=nil)
+
+        u = URI(Sentofu::AUTH_URI)
 
         cs = narrow_credentials(credentials)
 
         a = Base64.encode64("#{cs.id}:#{cs.secret}").strip
         #p a
 
-        req = Net::HTTP::Post.new('/v1/oauth/token')
+        req = Net::HTTP::Post.new(u.path)
         req.add_field('Content-Type', 'application/json')
         req.add_field('Authorization', a)
 
         req.body = JSON.dump(
           grant_type: 'password', username: cs.user, password: cs.pass)
 
-        res = request(req)
-        #pp res
+        res = make_http(u).request(req)
 
         Sentofu::Token.new(res)
       end
@@ -35,6 +34,11 @@ module Sentofu
         #def res.headers; r = {}; each_header { |k, v| r[k] = v }; r; end
 
         res
+      end
+
+      def get_and_parse(uri, token=nil)
+
+        JSON.parse(get(uri, token).body)
       end
 
       protected
@@ -63,15 +67,6 @@ module Sentofu
 #pp req.instance_variable_get(:@header)
 
         req
-      end
-
-      def request(req)
-
-        t = Net::HTTP.new(HOST, 443)
-        t.use_ssl = true
-        #t.verify_mode = OpenSSL::SSL::VERIFY_NONE # avoid
-
-        t.request(req)
       end
 
       def narrow_credentials(o)
