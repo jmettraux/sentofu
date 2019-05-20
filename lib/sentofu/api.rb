@@ -3,6 +3,8 @@ module Sentofu
 
   class Resource
 
+    TVP = '_sentofu_' # THREAD VARIABLE PREFIX
+
     attr_reader :parent, :segment
 
     def initialize(parent, segment)
@@ -23,7 +25,7 @@ module Sentofu
 
       if mth == :[]
         define_singleton_method(:[]) { |i|
-          Thread.current.thread_variable_set(segment, i); res }
+          Thread.current.thread_variable_set(TVP + segment, i); res }
       else
         define_singleton_method(mth) {
           res }
@@ -50,7 +52,7 @@ module Sentofu
 #p [ :fetch, segment, '(point)', index, query ]
 #p path(segment)
 #pp point
-      Thread.current.thread_variable_set(segment, index) if index
+      Thread.current.thread_variable_set(TVP + segment, index) if index
 
       validate_query_parameters(point, query)
 
@@ -66,7 +68,7 @@ nil
 
       seg =
         segment[0, 1] == '{' ?
-        Thread.current.thread_variable_get(segment).to_s :
+        Thread.current.thread_variable_get(TVP + segment).to_s :
         segment
 
       if parent
