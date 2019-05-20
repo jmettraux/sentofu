@@ -4,30 +4,32 @@ module Sentofu
   class Resource
 
     attr_reader :parent, :segment
+    attr_accessor :index
 
     def initialize(parent, segment)
 
       @parent = parent
       @segment = segment
       @children = {}
+      @index = nil
     end
 
     def add_segment(segment)
 
-      m = segment.match(/\A\{([^}]+)\}\z/)
+      m = segment.match(/\A\{[^}]+\}\z/)
       mth = m ? :[] : segment
 
       return @children[mth] if @children[mth]
 
+      res = @children[mth] = Sentofu::Resource.new(self, segment)
+
       if mth == :[]
-        @children[:[]] = res = Sentofu::Resource.new(self, m[1])
         define_singleton_method(:[]) { |i| res.index = i; res }
-        res
       else
-        @children[mth] = res = Sentofu::Resource.new(self, segment)
         define_singleton_method(mth) { res }
-        res
       end
+
+      res
     end
 
     def add_leaf_segment(segment, point)
@@ -52,20 +54,22 @@ module Sentofu
 
       validate_query_parameters(point, query)
 
-      return query if query[:debug_query]
+      pa = File.join(path, segment)
+      pa = pa.gsub(/_/, '-')
+
+      return query.merge(path: pa) if query[:debug]
 
 nil
     end
 
-    def path(segment=nil)
+    def path
 
-      segment ||= self.segment
-      segment = segment.gsub(/_/, '-')
+      seg = index ? index.to_s : segment
 
       if parent
-        File.join(parent.send(:path), segment)
+        File.join(parent.send(:path), seg)
       else
-        '/' + segment
+        seg
       end
     end
 
@@ -109,7 +113,7 @@ nil
 
     def initialize(spec, name)
 
-      super(nil, nil)
+      super(nil, spec['servers'].first['url'])
 
       @spec = spec
       @name = name
