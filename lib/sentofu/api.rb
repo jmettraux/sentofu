@@ -152,11 +152,16 @@ module Sentofu
 
     def token
 
-      if @token && @token.not_expired
+      if @token && @token.not_expired?
         @token
       else
         @token = Sentofu::Http.fetch_token(@credentials)
       end
+    end
+
+    def paths
+
+      @spec['paths']
     end
 
     class << self

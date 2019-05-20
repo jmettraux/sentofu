@@ -98,14 +98,35 @@ describe Sentofu::Api do
       end
     end
 
-    context 'company /topic/search' do
+    context 'company' do
 
-      it 'finds IBM' do
+      context '/topic/search' do
 
-        r = Sentofu.company.topic_search(keyword: 'ibm')
+        it 'finds IBM' do
 
-        expect(r.class).to eq(Hash)
-        expect(r['data'][0]['id']).to eq(128) # nice ;-)
+          r = Sentofu.company.topic_search(keyword: 'ibm')
+
+          expect(r.class).to eq(Hash)
+          expect(r['data'].collect { |e| e['id'] }).to include(128)
+        end
+
+        it 'finds Apple' do
+
+          r = Sentofu.company.topic_search(keyword: 'aapl')
+
+          expect(r.class).to eq(Hash)
+          expect(r['data'].collect { |e| e['id'] }).to include(579)
+        end
+      end
+
+      context '/topic/{id}/summary-insights' do
+
+        it 'returns a summary for IBM' do
+
+          r = Sentofu.company.topic[128].summary_insights
+
+          expect(r['data'].first).to have_key('direction')
+        end
       end
     end
   end

@@ -43,7 +43,9 @@ if $0 == __FILE__
   #pp y['paths'].keys
 
   #p Sentofu.company.class
-  p Sentofu.company.topic_search
+  #p Sentofu.company.topic_search
   #pp Sentofu.markets
+
+  puts Sentofu.company.paths.keys
 end
 
