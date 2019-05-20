@@ -89,6 +89,8 @@ module Sentofu
             case v
             when Symbol then v.to_s
             when Array then v.collect(&:to_s).join(',')
+            #when Time, Date then v.utc.strftime('%F')
+            when Time, Date then v.strftime('%F')
             else v
             end
           h }
@@ -188,8 +190,33 @@ module Sentofu
             .gsub(/([a-z])([A-Z])/) { |_| $1 + '_' + $2.downcase }
             .gsub(/([A-Z])/) { |c| c.downcase }
 
+        inflate_parameters(spec)
+
         api = Sentofu::Api.new(spec, last_modified, name)
         Sentofu.define_singleton_method(name) { api }
+      end
+
+      protected
+
+      def inflate_parameters(spec)
+
+        refs = spec['components']['parameters']
+          .inject({}) { |h, (k, v)|
+            h["#/components/parameters/#{k}"] = v
+            h }
+
+        spec['paths'].each do |_, pa|
+          pa.each do |_, me|
+            next unless me['parameters']
+            me['parameters'] = me['parameters']
+              .collect { |pm|
+                if ref = pm['$ref']
+                  refs[ref] || fail("found no $ref #{ref.inspect} in spec")
+                else
+                  pm
+                end }
+          end
+        end
       end
     end
   end

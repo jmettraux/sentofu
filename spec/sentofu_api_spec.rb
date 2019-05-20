@@ -64,7 +64,9 @@ describe Sentofu::Api do
 
       it 'works with single segments' do
 
-        r = Sentofu.company.topic_search(keyword: 'ibm', debug: true)
+        r = Sentofu.company
+          .topic_search(
+            keyword: 'ibm', debug: true)
 
         expect(r[:path]).to eq(
           'https://apis.sentifi.com/v1/intelligence' +
@@ -73,20 +75,29 @@ describe Sentofu::Api do
 
       it 'works with multiple segments' do
 
-        r = Sentofu.company.attention.event(debug: true)
+        r = Sentofu.company
+          .attention.event(
+            start_date: Time.now - 3 * 24 * 3600,
+            end_date: Time.now,
+            debug: true)
 
-        expect(r[:path]).to eq(
+        expect(r[:path].split('?').first).to eq(
           'https://apis.sentifi.com/v1/intelligence' +
           '/attention/event')
+        expect(r[:path]).to match(/\?start-date=/)
+        expect(r[:path]).to match(/&end-date=/)
       end
 
       it 'works with multiple segments (2)' do
 
-        r = Sentofu.markets.asset.insight.region(debug: true)
+        r = Sentofu.markets
+          .asset.insight.region(
+            period: :lastmonth, debug: true)
 
         expect(r[:path]).to eq(
           'https://apis.sentifi.com/v1/intelligence' +
-          '/markets/asset/insight/region')
+          '/markets/asset/insight/region' +
+          '?period=lastmonth')
       end
 
       it 'works with indexed segments' do
@@ -136,8 +147,14 @@ describe Sentofu::Api do
 
           r = Sentofu.company
             .sentiment.topic(
+              start_date: Time.now - 15 * 24 * 3600,
+              end_date: Time.now,
               topic_ids: [ 128, 579 ])
-pp r
+
+          expect(r['data'].size).to eq(2)
+          expect(r['data'][0]['info']['ticker']).to eq('IBM')
+          expect(r['data'][0]['sentiments'].class).to eq(Array)
+          expect(r['data'][1]['info']['ticker']).to eq('AAPL')
         end
       end
     end

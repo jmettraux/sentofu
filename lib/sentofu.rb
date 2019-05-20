@@ -46,6 +46,6 @@ if $0 == __FILE__
   #p Sentofu.company.topic_search
   #pp Sentofu.markets
 
-  puts Sentofu.company.paths.keys
+  #puts Sentofu.company.paths.keys
 end
 
