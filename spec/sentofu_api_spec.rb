@@ -103,7 +103,9 @@ describe Sentofu::Api do
       it 'finds IBM' do
 
         r = Sentofu.company.topic_search(keyword: 'ibm')
-pp r
+
+        expect(r.class).to eq(Hash)
+        expect(r['data'][0]['id']).to eq(128) # nice ;-)
       end
     end
   end

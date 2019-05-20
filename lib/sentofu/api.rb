@@ -61,7 +61,9 @@ module Sentofu
 
       return query.merge(path: pa) if query[:debug]
 
-      Sentofu::Http.get(pa + '?' + URI.encode_www_form(query), api.token)
+      JSON.parse(
+        Sentofu::Http.get(
+          pa + '?' + URI.encode_www_form(query), api.token))
     end
 
     def path
@@ -120,6 +122,7 @@ module Sentofu
   class Api < Resource
 
     attr_reader :spec
+    attr_accessor :credentials
 
     def initialize(spec, name)
 
@@ -127,6 +130,8 @@ module Sentofu
 
       @spec = spec
       @name = name
+
+      @credentials = nil
       @token = nil
 
 #puts "================== #{name}"
@@ -148,7 +153,7 @@ module Sentofu
       if @token && @token.not_expired
         @token
       else
-        @token = Sentofu::Http.fetch_token
+        @token = Sentofu::Http.fetch_token(@credentials)
       end
     end
 

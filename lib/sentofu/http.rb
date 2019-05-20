@@ -27,10 +27,10 @@ module Sentofu
         Sentofu::Token.new(res)
       end
 
-      def get(uri)
+      def get(uri, token=nil)
 
         u = URI(uri)
-        res = make_http(u).request(make_get_req(u))
+        res = make_http(u).request(make_get_req(u, token))
 
         res.body
       end
@@ -39,20 +39,25 @@ module Sentofu
 
       def make_http(uri)
 
+#p uri.to_s
         t = Net::HTTP.new(uri.host, uri.port)
         t.use_ssl = (uri.scheme == 'https')
+#t.set_debug_output($stdout) if uri.to_s.match(/ibm/)
 
         t
       end
 
-      def make_get_req(uri)
+      def make_get_req(uri, token)
 
-        req = Net::HTTP::Get.new(uri.path)
+        req = Net::HTTP::Get.new(uri.to_s)
+        req.instance_eval { @header.clear }
         def req.set_header(k, v); @header[k] = [ v ]; end
 
         req.set_header('User-Agent', "Sentofu #{Sentofu::VERSION}")
-        req.set_header('Content-Type', 'application/json')
-        #req.add_field('Authorization', a)
+        req.set_header('Accept', 'application/json')
+
+        req.set_header('Authorization', token.header_value) if token
+#pp req.instance_variable_get(:@header)
 
         req
       end
