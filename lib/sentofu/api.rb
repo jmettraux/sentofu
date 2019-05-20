@@ -4,14 +4,12 @@ module Sentofu
   class Resource
 
     attr_reader :parent, :segment
-    attr_accessor :index
 
     def initialize(parent, segment)
 
       @parent = parent
       @segment = segment
       @children = {}
-      @index = nil
     end
 
     def add_segment(segment)
@@ -24,9 +22,11 @@ module Sentofu
       res = @children[mth] = Sentofu::Resource.new(self, segment)
 
       if mth == :[]
-        define_singleton_method(:[]) { |i| res.index = i; res }
+        define_singleton_method(:[]) { |i|
+          Thread.current.thread_variable_set(segment, i); res }
       else
-        define_singleton_method(mth) { res }
+        define_singleton_method(mth) {
+          res }
       end
 
       res
@@ -50,7 +50,7 @@ module Sentofu
 #p [ :fetch, segment, '(point)', index, query ]
 #p path(segment)
 #pp point
-      self.index = index if index
+      Thread.current.thread_variable_set(segment, index) if index
 
       validate_query_parameters(point, query)
 
@@ -64,7 +64,10 @@ nil
 
     def path
 
-      seg = index ? index.to_s : segment
+      seg =
+        segment[0, 1] == '{' ?
+        Thread.current.thread_variable_get(segment).to_s :
+        segment
 
       if parent
         File.join(parent.send(:path), seg)

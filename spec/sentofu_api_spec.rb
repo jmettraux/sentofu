@@ -68,7 +68,6 @@ describe Sentofu::Api do
 
         expect(r[:path]).to eq(
           'https://apis.sentifi.com/v1/intelligence/topic-search')
-
       end
 
       it 'works with multiple segments' do
