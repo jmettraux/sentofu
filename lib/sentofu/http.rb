@@ -24,7 +24,7 @@ module Sentofu
         res = request(req)
         #pp res
 
-        OpenStruct.new(JSON.parse(res.body))
+        Sentofu::Token.new(res)
       end
 
       def get(uri)
@@ -81,6 +81,25 @@ module Sentofu
 
         OpenStruct.new(YAML.load(File.read(fname)))
       end
+    end
+  end
+
+  class Token
+
+    def initialize(res)
+
+      @h = JSON.parse(res.body)
+      @expires_at = Time.now + @h['expires_in']
+    end
+
+    def not_expired?
+
+      Time.now < @expires_at
+    end
+
+    def header_value
+
+      'Bearer ' + @h['access_token']
     end
   end
 end

@@ -61,7 +61,7 @@ module Sentofu
 
       return query.merge(path: pa) if query[:debug]
 
-nil
+      Sentofu::Http.get(pa + '?' + URI.encode_www_form(query), api.token)
     end
 
     def path
@@ -110,6 +110,11 @@ nil
           ) if v && enu && ! enu.include?(v)
             }
     end
+
+    def api
+
+      parent ? parent.api : self
+    end
   end
 
   class Api < Resource
@@ -122,6 +127,7 @@ nil
 
       @spec = spec
       @name = name
+      @token = nil
 
 #puts "================== #{name}"
       spec['paths'].each do |path, point|
@@ -134,6 +140,15 @@ nil
           re = re.add_segment(pa)
         end
         re.add_leaf_segment(pas.last, point)
+      end
+    end
+
+    def token
+
+      if @token && @token.not_expired
+        @token
+      else
+        @token = Sentofu::Http.fetch_token
       end
     end
 

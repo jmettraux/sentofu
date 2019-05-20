@@ -97,6 +97,15 @@ describe Sentofu::Api do
           '/topic/3/summary-price')
       end
     end
+
+    context 'company /topic/search' do
+
+      it 'finds IBM' do
+
+        r = Sentofu.company.topic_search(keyword: 'ibm')
+pp r
+      end
+    end
   end
 end
 

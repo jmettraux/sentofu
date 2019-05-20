@@ -1,5 +1,6 @@
 
 require 'json'
+require 'yaml'
 require 'base64'
 require 'ostruct'
 require 'net/http'
