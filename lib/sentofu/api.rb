@@ -63,7 +63,8 @@ module Sentofu
 
       JSON.parse(
         Sentofu::Http.get(
-          pa + '?' + URI.encode_www_form(query), api.token))
+          pa + '?' + URI.encode_www_form(query), api.token)
+            .body)
     end
 
     def path
@@ -121,14 +122,15 @@ module Sentofu
 
   class Api < Resource
 
-    attr_reader :spec
+    attr_reader :spec, :last_modified
     attr_accessor :credentials
 
-    def initialize(spec, name)
+    def initialize(spec, last_modified, name)
 
       super(nil, spec['servers'].first['url'])
 
       @spec = spec
+      @last_modified = last_modified
       @name = name
 
       @credentials = nil
@@ -159,15 +161,20 @@ module Sentofu
 
     class << self
 
-      def make(api_spec)
+      def make(api_res)
+
+        spec = JSON.parse(api_res.body)
+
+        last_modified = api_res.header['last-modified']
+        last_modified = Time.parse(last_modified) rescue nil
 
         name =
-          api_spec['info']['title'].split(' - ').last[0..-4].strip
+          spec['info']['title'].split(' - ').last[0..-4].strip
             .gsub(/([a-z])([A-Z])/) { |_| $1 + '_' + $2.downcase }
             .gsub(/([A-Z])/) { |c| c.downcase }
 
-        api = Sentofu::Api.new(api_spec, name)
-        (class << Sentofu; self; end).define_method(name) { api }
+        api = Sentofu::Api.new(spec, last_modified, name)
+        Sentofu.define_singleton_method(name) { api }
       end
     end
   end

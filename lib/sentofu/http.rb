@@ -30,9 +30,11 @@ module Sentofu
       def get(uri, token=nil)
 
         u = URI(uri)
-        res = make_http(u).request(make_get_req(u, token))
 
-        res.body
+        res = make_http(u).request(make_get_req(u, token))
+        #def res.headers; r = {}; each_header { |k, v| r[k] = v }; r; end
+
+        res
       end
 
       protected
@@ -43,6 +45,7 @@ module Sentofu
         t = Net::HTTP.new(uri.host, uri.port)
         t.use_ssl = (uri.scheme == 'https')
 #t.set_debug_output($stdout) if uri.to_s.match(/ibm/)
+#t.set_debug_output($stdout) if uri.to_s.match(/docs/)
 
         t
       end
