@@ -14,6 +14,10 @@ module Sentofu
 
   VERSION = '0.1.0'
 
+  USER_AGENT =
+    "Sentofu #{Sentofu::VERSION} - " +
+    [ 'Ruby', RUBY_VERSION, RUBY_RELEASE_DATE, RUBY_PLATFORM ].join(' ')
+
   auth_spec =
     Sentofu::Http.get_and_parse(
 	 'https://api.swaggerhub.com/apis/sentifi-api-docs/' +
