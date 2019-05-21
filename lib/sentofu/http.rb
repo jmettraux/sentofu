@@ -7,7 +7,7 @@ module Sentofu
 
       def fetch_token(credentials=nil)
 
-        u = URI(Sentofu::AUTH_URI)
+        u = URI(Sentofu.auth_uri)
 
         cs = narrow_credentials(credentials)
 

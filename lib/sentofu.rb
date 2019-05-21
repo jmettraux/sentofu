@@ -22,27 +22,37 @@ module Sentofu
 
   class << self
 
-    attr_reader :apis
-    def add_api(name, api); (@apis ||= {})[name] = api; end
-
+    attr_reader :auth_uri, :apis
     attr_accessor :user_agent
   end
 
-  auth_spec =
-    Sentofu::Http.get_and_parse(
-	 'https://api.swaggerhub.com/apis/sentifi-api-docs/' +
-     'sentifi-api_o_auth_2_authentication_and_authorization/1.0.0/')
-  AUTH_URI =
-    auth_spec['servers'][0]['url'] + auth_spec['paths'].keys.first
+  @auth_uri = nil
+  @apis = {}
 
-# TODO read local if SENTOFU_API_SPEC_DIR present
-  %w[ company markets ].each do |api_name|
+  Sentofu::Http.get_and_parse(
+    'https://api.swaggerhub.com/apis/sentifi-api-docs/')['apis']
+      .each { |meta|
 
-    Sentofu::Api.make(
-      Sentofu::Http.get(
-	    "https://api.swaggerhub.com/apis/sentifi-api-docs/" +
-        "sentifi-intelligence_#{api_name}_api/1.0.0/"))
-  end
+        name =
+          case meta['name']
+          when /OAuth/i then :auth
+          when / - (.+) API\z/ then $1.downcase.gsub(/ +/, '-')
+          else nil
+          end
+        next unless name
+
+        spec_uri = meta['properties']
+          .find { |pr| pr['type'] == 'Swagger' }['url']
+        spec = Sentofu::Http.get_and_parse(spec_uri)
+        spec[:meta] = meta
+
+        if name == :auth
+          @auth_uri = spec['servers'][0]['url'] + spec['paths'].keys.first
+        else
+          api = Sentofu::Api.new(name, spec)
+          Sentofu.define_singleton_method(name) { api }
+          @apis[name] = api
+        end }
 end
 
 

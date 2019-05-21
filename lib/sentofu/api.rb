@@ -134,19 +134,20 @@ module Sentofu
 
   class Api < Resource
 
-    attr_reader :spec, :last_modified
+    attr_reader :spec
     attr_accessor :credentials
 
-    def initialize(spec, last_modified, name)
+    def initialize(name, spec)
 
       super(nil, spec['servers'].first['url'])
 
-      @spec = spec
-      @last_modified = last_modified
       @name = name
+      @spec = spec
 
       @credentials = nil
       @token = nil
+
+      inflate_parameters
 
 #puts "================== #{name}"
       spec['paths'].each do |path, point|
@@ -176,50 +177,28 @@ module Sentofu
       @spec['paths']
     end
 
-    class << self
+    protected
 
-      def make(api_res)
+    def inflate_parameters
 
-        spec = JSON.parse(api_res.body)
+      pars = @spec['components']['parameters']
+      return unless pars
 
-        last_modified = api_res.header['last-modified']
-        last_modified = Time.parse(last_modified) rescue nil
+      refs = pars
+        .inject({}) { |h, (k, v)|
+          h["#/components/parameters/#{k}"] = v
+          h }
 
-        name =
-          spec['info']['title'].split(' - ').last[0..-4].strip
-            .gsub(/([a-z])([A-Z])/) { |_| $1 + '_' + $2.downcase }
-            .gsub(/([A-Z])/) { |c| c.downcase }
-
-        inflate_parameters(spec)
-
-        api = Sentofu::Api.new(spec, last_modified, name)
-
-        Sentofu.define_singleton_method(name) { api }
-        Sentofu.add_api(name, api)
-
-        api
-      end
-
-      protected
-
-      def inflate_parameters(spec)
-
-        refs = spec['components']['parameters']
-          .inject({}) { |h, (k, v)|
-            h["#/components/parameters/#{k}"] = v
-            h }
-
-        spec['paths'].each do |_, pa|
-          pa.each do |_, me|
-            next unless me['parameters']
-            me['parameters'] = me['parameters']
-              .collect { |pm|
-                if ref = pm['$ref']
-                  refs[ref] || fail("found no $ref #{ref.inspect} in spec")
-                else
-                  pm
-                end }
-          end
+      @spec['paths'].each do |_, pa|
+        pa.each do |_, me|
+          next unless me['parameters']
+          me['parameters'] = me['parameters']
+            .collect { |pm|
+              if ref = pm['$ref']
+                refs[ref] || fail("found no $ref #{ref.inspect} in spec")
+              else
+                pm
+              end }
         end
       end
     end
