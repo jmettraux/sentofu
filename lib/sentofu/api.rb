@@ -193,7 +193,11 @@ module Sentofu
         inflate_parameters(spec)
 
         api = Sentofu::Api.new(spec, last_modified, name)
+
         Sentofu.define_singleton_method(name) { api }
+        Sentofu.add_api(name, api)
+
+        api
       end
 
       protected

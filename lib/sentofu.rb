@@ -25,6 +25,11 @@ module Sentofu
   AUTH_URI =
     auth_spec['servers'][0]['url'] + auth_spec['paths'].keys.first
 
+  class << self
+    attr_reader :apis
+    def add_api(name, api); (@apis ||= {})[name] = api; end
+  end
+
 # TODO read local if SENTOFU_API_SPEC_DIR present
   %w[ company markets ].each do |api_name|
 
