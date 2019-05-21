@@ -41,6 +41,7 @@ test: spec
 ## specific to project ##
 
 fetch_apis:
+	curl https://api.swaggerhub.com/apis/sentifi-api-docs/sentifi-intelligence_common_api/1.0.0/swagger.yaml > api_common.yaml
 	curl https://api.swaggerhub.com/apis/sentifi-api-docs/sentifi-intelligence_company_api/1.0.0/swagger.yaml > api_company.yaml
 	curl https://api.swaggerhub.com/apis/sentifi-api-docs/sentifi-intelligence_markets_api/1.0.0/swagger.yaml > api_markets.yaml
 
