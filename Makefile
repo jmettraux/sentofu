@@ -40,6 +40,9 @@ test: spec
 
 ## specific to project ##
 
+list_apis:
+	time bundle exec ruby -I lib -r yaml -r sentofu -e "puts YAML.dump(Sentofu::Http.get_and_parse('https://api.swaggerhub.com/apis/sentifi-api-docs/'))"
+
 fetch_apis:
 	curl https://api.swaggerhub.com/apis/sentifi-api-docs/sentifi-intelligence_common_api/1.0.0/swagger.yaml > api_common.yaml
 	curl https://api.swaggerhub.com/apis/sentifi-api-docs/sentifi-intelligence_company_api/1.0.0/swagger.yaml > api_company.yaml
@@ -48,5 +51,5 @@ fetch_apis:
 
 ## done ##
 
-.PHONY: count_lines scan gemspec_validate name cw build push spec fetch_apis
+.PHONY: count_lines scan gemspec_validate name cw build push spec list_apis fetch_apis
 

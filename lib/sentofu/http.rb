@@ -30,8 +30,10 @@ module Sentofu
 
         u = URI(uri)
 
+#t0 = Time.now
         res = make_http(u).request(make_get_req(u, token))
         #def res.headers; r = {}; each_header { |k, v| r[k] = v }; r; end
+#puts "*** GET #{uri} took #{Time.now - t0}s"
 
         res
       end
