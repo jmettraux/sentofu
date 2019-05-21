@@ -177,6 +177,19 @@ module Sentofu
       @spec['paths']
     end
 
+    def modified
+
+      Time.parse(
+        @spec[:meta]['properties']
+          .find { |pr| pr['type'] == 'X-Modified' }['value'])
+    end
+
+    def version
+
+      @spec[:meta]['properties']
+        .find { |pr| pr['type'] == 'X-Version' }['value']
+    end
+
     protected
 
     def inflate_parameters

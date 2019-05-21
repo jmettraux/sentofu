@@ -10,6 +10,26 @@ require 'spec_helper'
 
 describe Sentofu::Api do
 
+  describe 'modified' do
+
+    it 'return the meta "modified" for the api' do
+
+      m = Sentofu.company.modified
+
+      expect(m.class).to eq(Time)
+    end
+  end
+
+  describe 'version' do
+
+    it 'returns the meta "version" for the api' do
+
+      v = Sentofu.company.version
+
+      expect(v.class).to eq(String)
+    end
+  end
+
   describe 'fetching' do
 
     context 'parameter checking' do
