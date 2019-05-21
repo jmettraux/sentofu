@@ -17,6 +17,16 @@ module Sentofu
   USER_AGENT =
     "Sentofu #{Sentofu::VERSION} - " +
     [ 'Ruby', RUBY_VERSION, RUBY_RELEASE_DATE, RUBY_PLATFORM ].join(' ')
+  @user_agent =
+    USER_AGENT
+
+  class << self
+
+    attr_reader :apis
+    def add_api(name, api); (@apis ||= {})[name] = api; end
+
+    attr_accessor :user_agent
+  end
 
   auth_spec =
     Sentofu::Http.get_and_parse(
@@ -24,11 +34,6 @@ module Sentofu
      'sentifi-api_o_auth_2_authentication_and_authorization/1.0.0/')
   AUTH_URI =
     auth_spec['servers'][0]['url'] + auth_spec['paths'].keys.first
-
-  class << self
-    attr_reader :apis
-    def add_api(name, api); (@apis ||= {})[name] = api; end
-  end
 
 # TODO read local if SENTOFU_API_SPEC_DIR present
   %w[ company markets ].each do |api_name|

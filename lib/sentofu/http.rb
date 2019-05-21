@@ -60,7 +60,7 @@ module Sentofu
         req.instance_eval { @header.clear }
         def req.set_header(k, v); @header[k] = [ v ]; end
 
-        req.set_header('User-Agent', Sentofu::USER_AGENT)
+        req.set_header('User-Agent', Sentofu.user_agent)
         req.set_header('Accept', 'application/json')
 
         req.set_header('Authorization', token.header_value) if token
