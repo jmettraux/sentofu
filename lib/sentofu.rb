@@ -20,39 +20,81 @@ module Sentofu
   @user_agent =
     USER_AGENT
 
+  @auth_uri = nil
+  @apis = {}
+
   class << self
 
     attr_reader :auth_uri, :apis
     attr_accessor :user_agent
-  end
 
-  @auth_uri = nil
-  @apis = {}
+    def init(versions=%w[ common:1.0.0 company:1.0.0 markets:1.0.0 ])
 
-  Sentofu::Http.get_and_parse(
-    'https://api.swaggerhub.com/apis/sentifi-api-docs/')['apis']
-      .each { |meta|
+      vers = split_versions(versions)
 
-        name =
-          case meta['name']
-          when /OAuth/i then :auth
-          when / - (.+) API\z/ then $1.downcase.gsub(/ +/, '-')
-          else nil
-          end
-        next unless name
+      vers << %w[ auth 1.0.0 ] unless vers.find { |n, _| n == 'auth' }
 
-        spec_uri = meta['properties']
-          .find { |pr| pr['type'] == 'Swagger' }['url']
-        spec = Sentofu::Http.get_and_parse(spec_uri)
+      vers.each do |api_name, ver_pattern|
+
+        doc_uri =
+          'https://api.swaggerhub.com/apis/sentifi-api-docs' +
+          (api_name == 'auth' ?
+            '/sentifi-api_o_auth_2_authentication_and_authorization/' :
+            "/sentifi-intelligence_#{api_name}_api/")
+
+        metas = Sentofu::Http.get_and_parse(doc_uri)
+
+        v, u, meta = metas['apis']
+          .collect { |m|
+            prs = m['properties']
+            [ prs.find { |pr| pr['type'] == 'X-Version' }['value'],
+              prs.find { |pr| pr['type'] == 'Swagger' }['url'],
+              m ] }
+          .select { |v, _, _| version_match(v, ver_pattern) }
+          .sort_by(&:first)
+          .first
+
+        spec = Sentofu::Http.get_and_parse(u)
         spec[:meta] = meta
 
-        if name == :auth
+        if api_name == 'auth'
           @auth_uri = spec['servers'][0]['url'] + spec['paths'].keys.first
         else
-          api = Sentofu::Api.new(name, spec)
-          Sentofu.define_singleton_method(name) { api }
-          @apis[name] = api
-        end }
+          api = Sentofu::Api.new(api_name, spec)
+          Sentofu.define_singleton_method(api_name) { api }
+          @apis[api_name] = api
+        end
+      end
+    end
+
+    protected
+
+    def split_versions(vs)
+
+      case vs
+      when Array then vs.collect { |v| split_version(v) }
+      when String then vs.split(';').collect { |v| split_version(v) }
+      else vs
+      end
+    end
+
+    def split_version(v)
+
+      v.is_a?(Array) ? v : v.split(':').collect(&:strip)
+    end
+
+    def version_match(version, pattern)
+
+      ves = version.split('.')
+      pattern.split('.').each do |pa|
+        ve = ves.shift
+        next if pa == 'x' || pa == '*'
+        return false if ve != pa
+      end
+
+      true
+    end
+  end
 end
 
 
@@ -71,5 +113,9 @@ if $0 == __FILE__
   #pp Sentofu.markets
 
   #puts Sentofu.company.paths.keys
+
+  t0 = Time.now
+  Sentofu.init
+  puts "took #{Time.now - t0}s..."
 end
 

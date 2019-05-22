@@ -9,6 +9,7 @@ require 'pp'
 #require 'ostruct'
 
 require 'sentofu'
+Sentofu.init
 
 
 module Helpers
