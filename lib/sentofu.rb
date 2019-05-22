@@ -70,7 +70,7 @@ module Sentofu
 
     def credentials=(cs)
 
-      apis.each { |api| api.credentials = cs }
+      apis.each { |_, api| api.credentials = cs }
     end
 
     protected
