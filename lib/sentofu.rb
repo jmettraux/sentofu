@@ -8,6 +8,7 @@ require 'net/http'
 
 require 'sentofu/http'
 require 'sentofu/api'
+require 'sentofu/explo'
 
 
 module Sentofu
