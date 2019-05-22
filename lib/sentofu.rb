@@ -78,9 +78,16 @@ module Sentofu
     def split_versions(vs)
 
       case vs
-      when Array then vs.collect { |v| split_version(v) }
-      when String then vs.split(';').collect { |v| split_version(v) }
-      else vs
+      when Array
+        vs
+          .select { |v| v.strip.length > 0 }
+          .collect { |v| split_version(v) }
+      when String
+        vs.split(/[,;]/)
+          .select { |v| v.strip.length > 0 }
+          .collect { |v| split_version(v) }
+      else
+        vs
       end
     end
 
