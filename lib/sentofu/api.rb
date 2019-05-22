@@ -177,6 +177,16 @@ module Sentofu
       @spec['paths']
     end
 
+    def query(path, params={})
+
+      pa = server + path
+      pa = pa + '?' + URI.encode_www_form(params) if params.any?
+
+      return params.merge(path: pa) if params[:debug]
+
+      JSON.parse(Sentofu::Http.get(pa, token).body)
+    end
+
     def modified
 
       Time.parse(
@@ -191,6 +201,11 @@ module Sentofu
     end
 
     protected
+
+    def server
+
+      @spec['servers'].first['url']
+    end
 
     def inflate_parameters
 

@@ -50,8 +50,7 @@ module Sentofu
 #p uri.to_s
         t = Net::HTTP.new(uri.host, uri.port)
         t.use_ssl = (uri.scheme == 'https')
-#t.set_debug_output($stdout) if uri.to_s.match(/ibm/)
-#t.set_debug_output($stdout) if uri.to_s.match(/docs/)
+#t.set_debug_output($stdout) if uri.to_s.match(/search/)
 
         t
       end

@@ -10,7 +10,7 @@ require 'spec_helper'
 
 describe Sentofu::Api do
 
-  describe 'modified' do
+  describe '#modified' do
 
     it 'return the meta "modified" for the api' do
 
@@ -20,7 +20,7 @@ describe Sentofu::Api do
     end
   end
 
-  describe 'version' do
+  describe '#version' do
 
     it 'returns the meta "version" for the api' do
 
@@ -177,6 +177,16 @@ describe Sentofu::Api do
           expect(r['data'][1]['info']['ticker']).to eq('AAPL')
         end
       end
+    end
+  end
+
+  describe '#query' do
+
+    it 'queries a path directly' do
+
+      r = Sentofu.company.query('/topic-search', keyword: 'ibm')
+
+      expect(r['data'].collect { |e| e['id'] }).to include(128)
     end
   end
 end
