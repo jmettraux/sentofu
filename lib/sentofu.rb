@@ -33,7 +33,7 @@ module Sentofu
 
       vers = split_versions(versions)
 
-      vers << %w[ auth 1.0.0 ] unless vers.find { |n, _| n == 'auth' }
+      vers << %w[ auth * ] unless vers.find { |n, _| n == 'auth' }
 
       vers.each do |api_name, ver_pattern|
 
