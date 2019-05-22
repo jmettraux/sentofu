@@ -68,6 +68,11 @@ module Sentofu
       end
     end
 
+    def credentials=(cs)
+
+      apis.each { |api| api.credentials = cs }
+    end
+
     protected
 
     def split_versions(vs)
