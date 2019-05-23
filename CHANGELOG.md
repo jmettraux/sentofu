@@ -2,6 +2,9 @@
 # CHANGELOG.md
 
 
+## sentofu 0.2.0  not yet released
+
+
 ## sentofu 0.1.0  released 2019-05-23
 
 * Initial implementation
