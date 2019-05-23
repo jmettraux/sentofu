@@ -49,9 +49,6 @@ module Sentofu
 
     def fetch(segment, point, index, query)
 
-#p [ :fetch, segment, '(point)', index, query ]
-#p path(segment)
-#pp point
       Thread.current.thread_variable_set(TVP + segment, index) if index
 
       q = rectify_query_parameters(point, query)
@@ -63,7 +60,7 @@ module Sentofu
 
       return query.merge(path: pa) if query[:debug]
 
-      JSON.parse(Sentofu::Http.get(pa, api.token).body)
+      Sentofu::Http.get_and_parse(pa, api.token)
     end
 
     def path
@@ -184,7 +181,7 @@ module Sentofu
 
       return params.merge(path: pa) if params[:debug]
 
-      JSON.parse(Sentofu::Http.get(pa, token).body)
+      Sentofu::Http.get_and_parse(pa, token)
     end
 
     def modified

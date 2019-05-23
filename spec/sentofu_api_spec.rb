@@ -187,6 +187,7 @@ describe Sentofu::Api do
       r = Sentofu.company.query('/topic-search', keyword: 'ibm')
 
       expect(r['data'].collect { |e| e['id'] }).to include(128)
+      expect(r[:_elapsed]).to be_a(Float)
     end
   end
 end

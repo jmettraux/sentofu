@@ -7,53 +7,55 @@ module Sentofu
 
       def fetch_token(credentials=nil)
 
-        u = URI(Sentofu.auth_uri)
-
         cs = narrow_credentials(credentials)
 
         a = Base64.encode64("#{cs.id}:#{cs.secret}").strip
-        #p a
 
-        req = Net::HTTP::Post.new(u.path)
+        req = Net::HTTP::Post.new(Sentofu.auth_uri)
         req.add_field('Content-Type', 'application/json')
         req.add_field('Authorization', a)
 
         req.body = JSON.dump(
           grant_type: 'password', username: cs.user, password: cs.pass)
 
-        res = make_http(u).request(req)
-
-        Sentofu::Token.new(res)
+        Sentofu::Token.new(request(Sentofu.auth_uri, req))
       end
 
       def get(uri, token=nil)
 
-        u = URI(uri)
+        request(uri, make_get_req(uri, token))
+      end
 
-#t0 = Time.now
-        res = make_http(u).request(make_get_req(u, token))
-        #def res.headers; r = {}; each_header { |k, v| r[k] = v }; r; end
-#puts "*** GET #{uri} took #{Time.now - t0}s"
+      def request(uri, req)
+
+        u = uri.is_a?(String) ? URI(uri) : uri
+
+        t0 = monow
+
+        t = Net::HTTP.new(u.host, u.port)
+        t.use_ssl = (u.scheme == 'https')
+#t.set_debug_output($stdout) if u.to_s.match(/search/)
+
+        res = t.request(req)
+
+        class << res; attr_accessor :_elapsed; end
+        res._elapsed = monow - t0
 
         res
       end
 
       def get_and_parse(uri, token=nil)
 
-        JSON.parse(get(uri, token).body)
+        res = get(uri, token)
+        r = JSON.parse(res.body)
+        r[:_elapsed] = res._elapsed
+
+        r
       end
 
       protected
 
-      def make_http(uri)
-
-#p uri.to_s
-        t = Net::HTTP.new(uri.host, uri.port)
-        t.use_ssl = (uri.scheme == 'https')
-#t.set_debug_output($stdout) if uri.to_s.match(/search/)
-
-        t
-      end
+      def monow; Process.clock_gettime(Process::CLOCK_MONOTONIC); end
 
       def make_get_req(uri, token)
 
@@ -65,7 +67,6 @@ module Sentofu
         req.set_header('Accept', 'application/json')
 
         req.set_header('Authorization', token.header_value) if token
-#pp req.instance_variable_get(:@header)
 
         req
       end
@@ -93,6 +94,7 @@ module Sentofu
     def initialize(res)
 
       @h = JSON.parse(res.body)
+      @h[:_elapsed] = res._elapsed
       @expires_at = Time.now + @h['expires_in']
     end
 
