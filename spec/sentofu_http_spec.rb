@@ -19,5 +19,19 @@ describe Sentofu::Http do
       expect(t.class).to eq(Sentofu::Token)
     end
   end
+
+  describe '.get_and_parse' do
+
+    it 'returns an error message when it cannot parse the message' do
+
+      h = Sentofu::Http.get_and_parse(
+        'https://apis.sentifi.com/v1/markets/events')
+
+      expect(h[:code]).to eq(404)
+      expect(h[:message]).to eq('Not Found')
+      expect(h[:error_class]).to eq('JSON::ParserError')
+      expect(h[:error_message]).to match(/unexpected token at /)
+    end
+  end
 end
 

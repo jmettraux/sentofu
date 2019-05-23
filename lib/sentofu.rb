@@ -3,6 +3,7 @@ require 'json'
 require 'yaml'
 require 'time'
 require 'base64'
+require 'webrick' # for the http code to message mapping
 require 'ostruct'
 require 'net/http'
 

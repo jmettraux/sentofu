@@ -51,6 +51,17 @@ module Sentofu
         r[:_elapsed] = res._elapsed
 
         r
+
+      rescue JSON::ParserError => pe
+
+        h = {}
+        h[:code] = res.code.to_i
+        h[:message] = WEBrick::HTTPStatus.reason_phrase(res.code)
+        h[:error_class] = pe.class.to_s
+        h[:error_message] = pe.message
+        h[:body] = res.body unless res.body.index('</html>')
+
+        h
       end
 
       protected
