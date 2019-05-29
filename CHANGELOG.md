@@ -2,6 +2,9 @@
 # CHANGELOG.md
 
 
+## sentofu 0.2.1  not yet released
+
+
 ## sentofu 0.2.0  released 2019-05-29
 
 * Accept a directory for Sentofu.init(x)
