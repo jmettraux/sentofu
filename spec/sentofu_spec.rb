@@ -33,5 +33,38 @@ describe Sentofu do
       end
     end
   end
+
+  describe '.init' do
+
+    context 'directory' do
+
+      after :each do
+
+        Sentofu.init
+      end
+
+      it 'inits from api_company_1.0.0.yaml and friends' do
+
+        expect(Sentofu.common.spec[:meta]).not_to eq(nil)
+
+        Sentofu.init('.')
+
+        expect(Sentofu.common.spec[:meta]).to eq(nil)
+
+        r = Sentofu.company.query('/topic-search', keyword: 'ibm')
+
+        expect(r['data'].collect { |e| e['id'] }).to include(128)
+      end
+
+      it 'fails if the target dir does not contain any api_*.yaml files' do
+
+        expect {
+          Sentofu.init('lib')
+        }.to raise_error(
+          RuntimeError, 'no api yaml files under "lib"'
+        )
+      end
+    end
+  end
 end
 

@@ -32,6 +32,38 @@ module Sentofu
 
     def init(versions=%w[ common:1.0.0 company:1.0.0 markets:1.0.0 ])
 
+      if versions.is_a?(String) && File.directory?(versions)
+        init_from_dir(versions)
+      else
+        init_from_swagger(versions)
+      end
+    end
+
+    def credentials=(cs)
+
+      apis.each { |_, api| api.credentials = cs }
+    end
+
+    protected
+
+    def init_from_dir(dir)
+
+      paths = Dir[File.join(dir, 'api_*.yaml')]
+
+      fail RuntimeError.new("no api yaml files under #{dir.inspect}") \
+        if paths.empty?
+
+      paths.each do |path|
+
+        api_name = path.match(/api_([^_]+)_\d/)[1]
+        api_spec = YAML.load(File.read(path))
+
+        init_api(api_name, api_spec)
+      end
+    end
+
+    def init_from_swagger(versions)
+
       vers = split_versions(versions)
 
       vers << %w[ auth * ] unless vers.find { |n, _| n == 'auth' }
@@ -59,22 +91,20 @@ module Sentofu
         spec = Sentofu::Http.get_and_parse(u)
         spec[:meta] = meta
 
-        if api_name == 'auth'
-          @auth_uri = spec['servers'][0]['url'] + spec['paths'].keys.first
-        else
-          api = Sentofu::Api.new(api_name, spec)
-          Sentofu.define_singleton_method(api_name) { api }
-          @apis[api_name] = api
-        end
+        init_api(api_name, spec)
       end
     end
 
-    def credentials=(cs)
+    def init_api(name, spec)
 
-      apis.each { |_, api| api.credentials = cs }
+      if name == 'auth'
+        @auth_uri = spec['servers'][0]['url'] + spec['paths'].keys.first
+      else
+        api = Sentofu::Api.new(name, spec)
+        Sentofu.define_singleton_method(name) { api }
+        @apis[name] = api
+      end
     end
-
-    protected
 
     def split_versions(vs)
 
