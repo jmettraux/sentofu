@@ -186,15 +186,12 @@ module Sentofu
 
     def modified
 
-      Time.parse(
-        @spec[:meta]['properties']
-          .find { |pr| pr['type'] == 'X-Modified' }['value'])
+      Time.parse(@spec[:meta][:modified])
     end
 
     def version
 
-      @spec[:meta]['properties']
-        .find { |pr| pr['type'] == 'X-Version' }['value']
+      @spec[:meta][:version]
     end
 
     protected

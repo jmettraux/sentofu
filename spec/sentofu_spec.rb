@@ -49,7 +49,17 @@ describe Sentofu do
 
         Sentofu.init('.')
 
-        expect(Sentofu.common.spec[:meta]).to eq(nil)
+        expect(
+          Sentofu.common.spec[:meta]
+        ).to eq({
+          modified: '2019-05-29T03:21Z',
+          name: 'common',
+          path: './api_common_1.0.0.yaml',
+          version: '1.0.0'
+        })
+
+        expect(Sentofu.company.version).to eq('1.0.0')
+        expect(Sentofu.company.modified).to eq(Time.parse('2019-05-29T03:21Z'))
 
         r = Sentofu.company.query('/topic-search', keyword: 'ibm')
 

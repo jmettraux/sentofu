@@ -55,8 +55,19 @@ module Sentofu
 
       paths.each do |path|
 
-        api_name = path.match(/api_([^_]+)_\d/)[1]
+        m = path.match(/api_([^_]+)_(\d+(?:\.\d+)*)\.yaml\z/)
+        next unless m
+
+        api_name = m[1]
+        api_version = m[2]
+
         api_spec = YAML.load(File.read(path))
+
+        api_spec[:meta] = {
+          name: api_name,
+          version: api_version,
+          path: path,
+          modified: File.mtime(path).utc.strftime('%FT%RZ') }
 
         init_api(api_name, api_spec)
       end
@@ -78,20 +89,26 @@ module Sentofu
 
         metas = Sentofu::Http.get_and_parse(doc_uri)
 
-        v, u, meta = metas['apis']
+        ver, mod, url, meta = metas['apis']
           .collect { |m|
             prs = m['properties']
             [ prs.find { |pr| pr['type'] == 'X-Version' }['value'],
+              prs.find { |pr| pr['type'] == 'X-Modified' }['value'],
               prs.find { |pr| pr['type'] == 'Swagger' }['url'],
               m ] }
-          .select { |v, _, _| version_match(v, ver_pattern) }
+          .select { |v, _, _, _| version_match(v, ver_pattern) }
           .sort_by(&:first)
           .first
 
-        spec = Sentofu::Http.get_and_parse(u)
-        spec[:meta] = meta
+        meta[:name] = api_name
+        meta[:version] = ver
+        meta[:url] = url
+        meta[:modified] = mod
 
-        init_api(api_name, spec)
+        api_spec = Sentofu::Http.get_and_parse(url)
+        api_spec[:meta] = meta
+
+        init_api(api_name, api_spec)
       end
     end
 
