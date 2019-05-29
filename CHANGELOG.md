@@ -2,7 +2,11 @@
 # CHANGELOG.md
 
 
-## sentofu 0.2.0  not yet released
+## sentofu 0.2.0  released 2019-05-29
+
+* Accept a directory for Sentofu.init(x)
+* Return a Hash error message on JSON parse error
+* Track request elapsed time
 
 
 ## sentofu 0.1.0  released 2019-05-23
