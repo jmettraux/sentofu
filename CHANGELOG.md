@@ -2,6 +2,9 @@
 # CHANGELOG.md
 
 
+## sentofu 0.3.0  not yet released
+
+
 ## sentofu 0.2.1  released 2019-05-30
 
 * Fix version/modified when loading from local yaml
