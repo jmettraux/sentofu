@@ -60,7 +60,17 @@ module Sentofu
 
       return query.merge(path: pa) if query[:debug]
 
-      Sentofu::Http.get_and_parse(pa, api.token)
+      get(pa)
+    end
+
+    def get(path)
+
+      res = Sentofu::Http.get_and_parse(path, api.token)
+
+      api.on_response(res) if api.respond_to?(:on_response)
+      Sentofu.on_response(res) if Sentofu.respond_to?(:on_response)
+
+      res
     end
 
     def path
@@ -181,7 +191,7 @@ module Sentofu
 
       return params.merge(path: pa) if params[:debug]
 
-      Sentofu::Http.get_and_parse(pa, token)
+      get(pa)
     end
 
     def modified

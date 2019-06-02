@@ -76,5 +76,40 @@ describe Sentofu do
       end
     end
   end
+
+  describe '.on_response' do
+
+    after :each do
+
+      module Sentofu
+        class << self
+          remove_method(:on_response)
+        end
+      end
+    end
+
+    it 'is called if present' do
+
+      def Sentofu.on_response(res)
+        res[:seen] = 1
+      end
+        #
+      #Sentofu.define_singleton_method(:on_response) do |res|
+      #  res[:seen] = 1
+      #end
+        #
+      #module Sentofu
+      #  def self.on_response(res)
+      #    res[:seen] = 1
+      #  end
+      #end
+
+      r = Sentofu.company.query('/topic-search', keyword: 'ibm')
+      expect(r[:seen]).to eq(1)
+
+      r = Sentofu.company.topic_search(keyword: 'ibm')
+      expect(r[:seen]).to eq(1)
+    end
+  end
 end
 
