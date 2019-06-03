@@ -190,5 +190,33 @@ describe Sentofu::Api do
       expect(r[:_elapsed]).to be_a(Float)
     end
   end
+
+  describe '#on_response' do
+
+    after :each do
+
+      class << Sentofu.company
+
+        remove_method(:on_response)
+      end
+    end
+
+    it 'is called if present' do
+
+      class << Sentofu.company
+        def on_response(res)
+          res[:count] = (res['data'].count rescue -1)
+        end
+      end
+
+      r = Sentofu.company.query('/topic-search', keyword: 'ibm')
+
+      expect(r[:count]).to eq(1)
+
+      r = Sentofu.company.topic_search(size: 30, keyword: 'the')
+
+      expect(r[:count]).to eq(30)
+    end
+  end
 end
 
