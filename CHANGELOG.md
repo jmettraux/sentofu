@@ -2,6 +2,9 @@
 # CHANGELOG.md
 
 
+## sentofu 0.3.1  not yet released
+
+
 ## sentofu 0.3.0  released 2019-06-05
 
 * Add Sentofu.on_response and Api#on_response
