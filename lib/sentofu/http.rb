@@ -26,22 +26,39 @@ module Sentofu
         request(uri, make_get_req(uri, token))
       end
 
+      PROXY_REX = /\A(([^:@]+)(:([^@]+))?@)?([^:]+)(:(\d+))?\z/
+
+      def make_net_http(uri)
+
+        http =
+          if pm = PROXY_REX.match(ENV['sentofu_http_proxy'] || '')
+            Net::HTTP.new(
+              uri.host, uri.port,
+              pm[5], pm[7] ? pm[7].to_i : nil,  # proxy host and port
+              pm[2], pm[4])                     # proxy user and pass
+          else
+            Net::HTTP.new(
+              uri.host, uri.port)
+          end
+
+        # Nota Bene:
+        # even if ENV['sentofu_http_proxy'], ENV['http_proxy'] could kick in
+
+        http.use_ssl = (uri.scheme == 'https')
+
+        http
+      end
+
       def request(uri, req)
 
         u = uri.is_a?(String) ? URI(uri) : uri
 
         t0 = monow
 
-        t = Net::HTTP.new(u.host, u.port)
-        #t = Net::HTTP.new(u.host, u.port, proxy_host, proxy_port)
-        #t = Net::HTTP.new(u.host, u.port, p_host, p_port, p_user, p_pass)
-          # or
-        #ENV['http_proxy'] = 'http://172.16.3.160:4226'
-
-        t.use_ssl = (u.scheme == 'https')
+        http = make_net_http(u)
 #t.set_debug_output($stdout) if u.to_s.match(/search/)
 
-        res = t.request(req)
+        res = http.request(req)
 
         class << res; attr_accessor :_elapsed; end
         res._elapsed = monow - t0
