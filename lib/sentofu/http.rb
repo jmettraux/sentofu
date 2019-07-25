@@ -33,6 +33,11 @@ module Sentofu
         t0 = monow
 
         t = Net::HTTP.new(u.host, u.port)
+        #t = Net::HTTP.new(u.host, u.port, proxy_host, proxy_port)
+        #t = Net::HTTP.new(u.host, u.port, p_host, p_port, p_user, p_pass)
+          # or
+        #ENV['http_proxy'] = 'http://172.16.3.160:4226'
+
         t.use_ssl = (u.scheme == 'https')
 #t.set_debug_output($stdout) if u.to_s.match(/search/)
 
