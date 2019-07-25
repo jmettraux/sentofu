@@ -2,7 +2,7 @@
 # CHANGELOG.md
 
 
-## sentofu 0.3.1  not yet released
+## sentofu 0.4.0  not yet released
 
 
 ## sentofu 0.3.0  released 2019-06-05
