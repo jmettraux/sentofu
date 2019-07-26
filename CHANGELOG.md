@@ -2,7 +2,9 @@
 # CHANGELOG.md
 
 
-## sentofu 0.4.1  not yet released
+## sentofu 0.4.1  released 2019-07-26
+
+* Refine 'sentofu_http_proxy' parsing
 
 
 ## sentofu 0.4.0  released 2019-07-26
