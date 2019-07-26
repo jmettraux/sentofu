@@ -40,7 +40,9 @@ module Sentofu
               uri.host, uri.port,
               pm[6], port,   # proxy host and port
               pm[3], pm[5])  # proxy user and pass
+
           else
+
             Net::HTTP.new(
               uri.host, uri.port)
           end
