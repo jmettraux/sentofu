@@ -2,6 +2,9 @@
 # CHANGELOG.md
 
 
+## sentofu 0.4.1  not yet released
+
+
 ## sentofu 0.4.0  released 2019-07-26
 
 * Accept `ENV['sentofu_http_proxy']`
