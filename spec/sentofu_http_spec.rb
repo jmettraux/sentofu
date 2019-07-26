@@ -33,5 +33,42 @@ describe Sentofu::Http do
       expect(h[:error_message]).to match(/unexpected token at /)
     end
   end
+
+  describe 'PROXY_REX' do
+
+    {
+      'user:pass@host.example.com:123' =>
+        { un: 'user', pw: 'pass', ho: 'host.example.com', pt: 123 },
+      'host.example.com:123' =>
+        { ho: 'host.example.com', pt: 123 },
+      'host.example.com' =>
+        { ho: 'host.example.com' },
+      'http://user:pass@host.example.com:123' =>
+        { un: 'user', pw: 'pass', ho: 'host.example.com', pt: 123 },
+      'http://host.example.com:123' =>
+        { ho: 'host.example.com', pt: 123 },
+      'http://host.example.com' =>
+        { ho: 'host.example.com' },
+      'https://host.example.com' =>
+        { ho: 'host.example.com', pt: 443 },
+      'https://host.example.com:8443' =>
+        { ho: 'host.example.com', pt: 8443 },
+
+    }.each do |uri, params|
+
+      it "extracts #{params.inspect} out of #{uri.inspect}" do
+
+        m = Sentofu::Http::PROXY_REX.match(uri)
+
+        ps = { ho: m[6] }
+        ps[:pt] = m[8].to_i if m[8]
+        ps[:un] = m[3] if m[3]
+        ps[:pw] = m[5] if m[5]
+        ps[:pt] ||= 443 if m[1] && m[1] == 'https://'
+
+        expect(ps).to eq(params)
+      end
+    end
+  end
 end
 

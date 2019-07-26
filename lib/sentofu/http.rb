@@ -3,6 +3,8 @@ module Sentofu
 
   module Http
 
+    PROXY_REX = /\A(https?:\/\/)?(([^:@]+)(:([^@]+))?@)?([^:]+)(:(\d+))?\z/
+
     class << self
 
       def fetch_token(credentials=nil)
@@ -26,16 +28,18 @@ module Sentofu
         request(uri, make_get_req(uri, token))
       end
 
-      PROXY_REX = /\A(([^:@]+)(:([^@]+))?@)?([^:]+)(:(\d+))?\z/
-
       def make_net_http(uri)
 
         http =
           if pm = PROXY_REX.match(ENV['sentofu_http_proxy'] || '')
+
+            port = m[8] ? m[8].to_i : nil
+            port ||= 443 if m[1] && m[1] == 'https://'
+
             Net::HTTP.new(
               uri.host, uri.port,
-              pm[5], pm[7] ? pm[7].to_i : nil,  # proxy host and port
-              pm[2], pm[4])                     # proxy user and pass
+              pm[6], port,   # proxy host and port
+              pm[3], pm[5])  # proxy user and pass
           else
             Net::HTTP.new(
               uri.host, uri.port)
