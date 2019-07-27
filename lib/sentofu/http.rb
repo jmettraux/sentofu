@@ -33,9 +33,10 @@ module Sentofu
         http =
           if pm = PROXY_REX.match(ENV['sentofu_http_proxy'] || '')
 
-            port = m[8] ? m[8].to_i : nil
-            port ||= 443 if m[1] && m[1] == 'https://'
+            port = pm[8] ? pm[8].to_i : nil
+            port ||= 443 if pm[1] && pm[1] == 'https://'
 
+#p [ pm[6], port, pm[3], pm[5] ]
             Net::HTTP.new(
               uri.host, uri.port,
               pm[6], port,   # proxy host and port

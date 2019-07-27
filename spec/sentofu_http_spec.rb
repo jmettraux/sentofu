@@ -70,5 +70,36 @@ describe Sentofu::Http do
       end
     end
   end
+
+  describe "ENV['sentofu_http_proxy']" do
+
+    after :each do
+      ENV.delete('sentofu_http_proxy')
+    end
+
+    it 'points sentofu to a HTTP proxy' do
+
+      ENV['sentofu_http_proxy'] = 'http://bob:pass@proxy.example.com'
+
+      expect {
+        Sentofu::Http.fetch_token
+      }.to raise_error(
+        SocketError,
+        /\AFailed to open TCP connection to proxy\.example\.com:80/
+      )
+    end
+
+    it 'points sentofu to a HTTP proxy' do
+
+      ENV['sentofu_http_proxy'] = 'https://bob:pass@proxy.example.com'
+
+      expect {
+        Sentofu::Http.fetch_token
+      }.to raise_error(
+        SocketError,
+        /\AFailed to open TCP connection to proxy\.example\.com:443/
+      )
+    end
+  end
 end
 
