@@ -53,6 +53,9 @@ describe Sentofu::Http do
         { ho: 'host.example.com', pt: 443 },
       'https://host.example.com:8443' =>
         { ho: 'host.example.com', pt: 8443 },
+      'http://ERABLE\ERLR0SRVSvc_STG - UAT:pass@sg.example.com:8080' =>
+        { un: 'ERABLE\ERLR0SRVSvc_STG - UAT', pw: 'pass',
+          ho: 'sg.example.com', pt: 8080 },
 
     }.each do |uri, params|
 
