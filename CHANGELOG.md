@@ -2,7 +2,9 @@
 # CHANGELOG.md
 
 
-## sentofu 0.5.0  not yet released
+## sentofu 0.5.0  released 2019-08-02
+
+* Introduce Sentofu.ssl_verify_mode attr accessor
 
 
 ## sentofu 0.4.2  released 2019-07-28
