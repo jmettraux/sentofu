@@ -2,6 +2,9 @@
 # CHANGELOG.md
 
 
+## sentofu 0.5.0  not yet released
+
+
 ## sentofu 0.4.2  released 2019-07-28
 
 * Fix HTTP proxy determination code
