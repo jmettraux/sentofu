@@ -5,6 +5,7 @@ require 'time'
 require 'base64'
 require 'webrick' # for the http code to message mapping
 require 'ostruct'
+require 'openssl'
 require 'net/http'
 
 require 'sentofu/http'
@@ -24,11 +25,12 @@ module Sentofu
 
   @auth_uri = nil
   @apis = {}
+  @ssl_verify_mode = OpenSSL::SSL::VERIFY_PEER
 
   class << self
 
     attr_reader :auth_uri, :apis
-    attr_accessor :user_agent
+    attr_accessor :user_agent, :ssl_verify_mode
 
     def init(versions=%w[ common:1.0.0 company:1.0.0 markets:1.0.0 ])
 

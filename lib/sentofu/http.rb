@@ -51,7 +51,10 @@ module Sentofu
         # Nota Bene:
         # even if ENV['sentofu_http_proxy'], ENV['http_proxy'] could kick in
 
-        http.use_ssl = (uri.scheme == 'https')
+        if uri.scheme == 'https'
+          http.use_ssl = true
+          http.verify_mode = Sentofu.ssl_verify_mode
+        end
 
         http
       end
