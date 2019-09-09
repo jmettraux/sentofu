@@ -70,7 +70,10 @@ module Sentofu
 
         res = http.request(req)
 
-        class << res; attr_accessor :_elapsed; end
+        class << res
+          attr_accessor :_elapsed
+          def _headers; each_header.inject({}) { |h, (k, v)| h[k] = v; h }; end
+        end
         res._elapsed = monow - t0
 
         res
@@ -79,21 +82,23 @@ module Sentofu
       def get_and_parse(uri, token=nil)
 
         res = get(uri, token)
-        r = JSON.parse(res.body)
-        r[:_elapsed] = res._elapsed
 
-        r
+        fail 'something went wrong' \
+          unless res.header['content-type'].match(/^application\/json(;|$)/)
 
-      rescue JSON::ParserError => pe
+        JSON.parse(res.body)
+          .merge!(_elapsed: res._elapsed)
 
-        h = {}
-        h[:code] = res.code.to_i
-        h[:message] = WEBrick::HTTPStatus.reason_phrase(res.code)
-        h[:error_class] = pe.class.to_s
-        h[:error_message] = pe.message
-        h[:body] = res.body unless res.body.index('</html>')
+      rescue => e
 
-        h
+        { uri: uri,
+          code: res.code.to_i,
+          headers: res._headers,
+          message: WEBrick::HTTPStatus.reason_phrase(res.code),
+          error_class: e.class.to_s,
+          error_message: e.message,
+          error_trace: e.backtrace,
+          body: (res.body.index('</html>') ? '<html>' : res.body) }
       end
 
       protected

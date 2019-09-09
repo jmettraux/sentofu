@@ -27,10 +27,11 @@ describe Sentofu::Http do
       h = Sentofu::Http.get_and_parse(
         'https://apis.sentifi.com/v1/markets/events')
 
+      expect(h[:uri]).to eq('https://apis.sentifi.com/v1/markets/events')
       expect(h[:code]).to eq(404)
       expect(h[:message]).to eq('Not Found')
-      expect(h[:error_class]).to eq('JSON::ParserError')
-      expect(h[:error_message]).to match(/unexpected token at /)
+      expect(h[:error_class]).to eq('RuntimeError')
+      expect(h[:error_message]).to match('something went wrong')
     end
   end
 
