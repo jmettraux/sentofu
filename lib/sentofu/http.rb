@@ -87,7 +87,9 @@ module Sentofu
           unless res.header['content-type'].match(/^application\/json(;|$)/)
 
         JSON.parse(res.body)
-          .merge!(_elapsed: res._elapsed)
+          .merge!(
+            _headers: res._headers,
+            _elapsed: res._elapsed)
 
       rescue => e
 

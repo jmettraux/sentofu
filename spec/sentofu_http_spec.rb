@@ -33,6 +33,21 @@ describe Sentofu::Http do
       expect(h[:error_class]).to eq('RuntimeError')
       expect(h[:error_message]).to match('something went wrong')
     end
+
+    it 'returns a Hash with the data and _headers and _elapsed' do
+
+      h = Sentofu::Http.get_and_parse(
+        'https://apis.sentifi.com/v1/intelligence' +
+        '/topic/3/summary-price',
+        Sentofu::Http.fetch_token)
+
+      expect(h[:_headers]
+        ).to be_a(Hash)
+      expect(h[:_headers]['content-type']
+        ).to eq('application/json;charset=UTF-8')
+
+      expect(h[:_elapsed]).to be_a(Float)
+    end
   end
 
   describe 'PROXY_REX' do

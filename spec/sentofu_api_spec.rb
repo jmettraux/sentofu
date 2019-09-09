@@ -26,7 +26,7 @@ describe Sentofu::Api do
 
       v = Sentofu.company.version
 
-      expect(v.class).to eq(String)
+      expect(v).to be_a(String)
     end
   end
 
@@ -187,6 +187,8 @@ describe Sentofu::Api do
       r = Sentofu.company.query('/topic-search', keyword: 'ibm')
 
       expect(r['data'].collect { |e| e['id'] }).to include(128)
+      expect(r[:_headers]).to be_a(Hash)
+      expect(r[:_headers]['content-type']).to match(/^application\/json(;|$)/)
       expect(r[:_elapsed]).to be_a(Float)
     end
   end
