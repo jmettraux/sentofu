@@ -2,7 +2,10 @@
 # CHANGELOG.md
 
 
-## sentofu 0.5.1  not yet released
+## sentofu 0.5.1  released 2019-09-10
+
+* Keep track of :_headers in result hashes
+* Revise error handling
 
 
 ## sentofu 0.5.0  released 2019-08-02
