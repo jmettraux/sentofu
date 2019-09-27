@@ -70,6 +70,9 @@ module Sentofu
 
         res = http.request(req)
 
+        fail "request returned a #{res.class} and not a Net::HTTPResponse" \
+          unless res.is_a?(Net::HTTPResponse)
+
         class << res
           attr_accessor :_elapsed
           def _headers; each_header.inject({}) { |h, (k, v)| h[k] = v; h }; end
@@ -91,16 +94,16 @@ module Sentofu
             _headers: res._headers,
             _elapsed: res._elapsed)
 
-      rescue => e
+      rescue => err
 
         { uri: uri,
-          code: res.code.to_i,
+          code: (res.code.to_i rescue nil),
           headers: res._headers,
-          message: WEBrick::HTTPStatus.reason_phrase(res.code),
-          error_class: e.class.to_s,
-          error_message: e.message,
-          error_trace: e.backtrace,
-          body: (res.body.index('</html>') ? '<html>' : res.body) }
+          message: (WEBrick::HTTPStatus.reason_phrase(res.code) rescue nil),
+          error_class: err.class.to_s,
+          error_message: err.message,
+          error_trace: err.backtrace,
+          body: ((res.body.index('</html>') ? '<html>' : res.body) rescue nil) }
       end
 
       protected
