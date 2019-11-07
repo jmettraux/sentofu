@@ -98,7 +98,7 @@ module Sentofu
 
         { uri: uri,
           code: (res.code.to_i rescue nil),
-          headers: res._headers,
+          headers: (res._headers rescue nil),
           message: (WEBrick::HTTPStatus.reason_phrase(res.code) rescue nil),
           error_class: err.class.to_s,
           error_message: err.message,
