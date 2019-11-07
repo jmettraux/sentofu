@@ -2,6 +2,9 @@
 # CHANGELOG.md
 
 
+## sentofu 0.5.3  not yet released
+
+
 ## sentofu 0.5.2  released 2019-09-27
 
 * Tighten request error interception
