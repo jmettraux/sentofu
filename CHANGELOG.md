@@ -4,6 +4,8 @@
 
 ## sentofu 0.5.4  not yet released
 
+* Prevent failure on missing GET parameters list
+
 
 ## sentofu 0.5.3  released 2019-11-07
 

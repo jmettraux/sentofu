@@ -130,6 +130,20 @@ describe Sentofu::Api do
       end
     end
 
+    context 'common' do
+
+      context '/markets/events' do
+
+        it 'works' do
+
+          r = Sentofu.common.markets.events
+pp r
+
+          expect(r.class).to eq(Hash)
+        end
+      end
+    end
+
     context 'company' do
 
       context '/topic/search' do

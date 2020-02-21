@@ -102,7 +102,7 @@ module Sentofu
             end
           h }
 
-      point['get']['parameters']
+      (point['get']['parameters'] || [])
         .each { |par|
 
           next if par['in'] != 'query'
