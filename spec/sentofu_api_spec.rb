@@ -99,6 +99,8 @@ describe Sentofu::Api do
           .attention.event(
             start_date: Time.now - 3 * 24 * 3600,
             end_date: Time.now,
+            topic_ids: [ 579 ],
+            impact_id: 123,
             debug: true)
 
         expect(r[:path].split('?').first).to eq(
