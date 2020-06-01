@@ -146,7 +146,15 @@ module Sentofu
 
     def initialize(name, spec)
 
-      super(nil, spec['servers'].first['url'])
+      u = spec['servers'].first['url'] rescue nil
+      unless u.is_a?(String) && u.match(/\Ahttps?:\/\//)
+#p name; pp spec; p u
+        c = spec['code'] rescue -1
+        m = spec['message'] rescue '(no message)'
+        fail "cannot setup #{name.inspect} API - HTTP #{c} - #{m.inspect}"
+      end
+
+      super(nil, u)
 
       @name = name
       @spec = spec
