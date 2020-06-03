@@ -2,7 +2,7 @@
 # CHANGELOG.md
 
 
-## sentofu 0.5.4  not yet released
+## sentofu 0.5.4  released 2020-06-03
 
 * Prevent failure on missing GET parameters list
 
