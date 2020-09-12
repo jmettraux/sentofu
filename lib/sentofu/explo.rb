@@ -33,10 +33,19 @@ module Sentofu
       puts
 
       list_apis.each do |h|
-        n = h['n']; n = "auth" if n.match(/auth/i)
+
+        n =
+          case nn = h['n']
+          when /auth/i then 'auth'
+          when /ESG Score API/ then 'escore'
+          else nn
+          end
+
         fn = "api_#{n}_#{h['v']}.yaml"
+
         res = Sentofu::Http.get(h['u'] + '/swagger.yaml')
         File.open(fn, 'wb') { |f| f.write(res.body) }
+
         puts "  wrote #{fn}"
       end
     end
