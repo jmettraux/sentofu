@@ -74,9 +74,10 @@ module Sentofu
           unless res.is_a?(Net::HTTPResponse)
 
         class << res
-          attr_accessor :_elapsed
+          attr_accessor :_uri, :_elapsed
           def _headers; each_header.inject({}) { |h, (k, v)| h[k] = v; h }; end
         end
+        res._uri = uri.to_s
         res._elapsed = monow - t0
 
         res
@@ -91,6 +92,7 @@ module Sentofu
 
         JSON.parse(res.body)
           .merge!(
+            _uri: res._uri,
             _headers: res._headers,
             _elapsed: res._elapsed)
 

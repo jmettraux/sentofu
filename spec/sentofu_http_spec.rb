@@ -34,19 +34,26 @@ describe Sentofu::Http do
       expect(h[:error_message]).to match('something went wrong')
     end
 
-    it 'returns a Hash with the data and _headers and _elapsed' do
+    it 'returns a Hash with the data, _uri, _headers, and _elapsed' do
 
       h = Sentofu::Http.get_and_parse(
         'https://apis.sentifi.com/v1/intelligence' +
         '/topic/3/summary-price',
         Sentofu::Http.fetch_token)
 
+      expect(h[:_uri]
+        ).to eq(
+          'https://apis.sentifi.com/v1/intelligence/topic/3/summary-price')
       expect(h[:_headers]
-        ).to be_a(Hash)
-      expect(h[:_headers]['content-type']
-        ).to eq('application/json;charset=UTF-8')
+        ).to be_a(
+          Hash)
+      expect(h[:_elapsed]
+        ).to be_a(
+          Float)
 
-      expect(h[:_elapsed]).to be_a(Float)
+      expect(h[:_headers]['content-type']
+        ).to eq(
+          'application/json;charset=UTF-8')
     end
 
     it 'grabs events' do
