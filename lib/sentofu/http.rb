@@ -66,7 +66,7 @@ module Sentofu
         t0 = monow
 
         http = make_net_http(u)
-#t.set_debug_output($stdout) if u.to_s.match(/search/)
+#t.set_debug_output($stdout) if u.to_s.match?(/search/)
 
         res = http.request(req)
 
@@ -87,7 +87,7 @@ module Sentofu
         res = get(uri, token)
 
         fail 'something went wrong' \
-          unless res.header['content-type'].match(/^application\/json(;|$)/)
+          unless res.header['content-type'].match?(/^application\/json(;|$)/)
 
         JSON.parse(res.body)
           .merge!(

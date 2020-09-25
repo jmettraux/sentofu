@@ -147,7 +147,7 @@ module Sentofu
     def initialize(name, spec)
 
       u = spec['servers'].first['url'] rescue nil
-      unless u.is_a?(String) && u.match(/\Ahttps?:\/\//)
+      unless u.is_a?(String) && u.match?(/\Ahttps?:\/\//)
 #p name; pp spec; p u
         c = spec['code'] rescue -1
         m = spec['message'] rescue '(no message)'
