@@ -10,7 +10,7 @@ Gem::Specification.new do |s|
   s.platform = Gem::Platform::RUBY
   s.authors = [ 'John Mettraux' ]
   s.email = [ 'jmettraux@gmail.com' ]
-  s.homepage = 'http://github.com/jmettraux/sentofu'
+  s.homepage = 'https://github.com/jmettraux/sentofu'
   s.license = 'MIT'
   s.summary = 'A Ruby client to some of the 1.0.0 Sentifi.com APIs'
 
