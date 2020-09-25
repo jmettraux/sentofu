@@ -49,15 +49,10 @@ describe Sentofu::Http do
       expect(h[:_elapsed]).to be_a(Float)
     end
 
-    it 'grabs sentiment-trend' do
-
-      # https://apis.sentifi.com/v1.1/intelligence/markets/custom-index/sentiment-trend?start-date=2019-08-01&end-date=2019-08-03&country-codes=us&topic-ids=579&theme-ids=4141
+    it 'grabs events' do
 
       h = Sentofu::Http.get_and_parse(
-        "https://apis.sentifi.com/v1.1/intelligence" +
-        "/markets/custom-index/sentiment-trend" +
-        "?start-date=2019-08-01&end-date=2019-08-03&country-codes=us" +
-        "&topic-ids=579&theme-ids=4141",
+        'https://apis.sentifi.com/v1/intelligence/markets/events',
         Sentofu::Http.fetch_token)
 
       expect(h[:_headers]
