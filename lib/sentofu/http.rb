@@ -70,15 +70,16 @@ module Sentofu
 
         res = http.request(req)
 
-        fail "request returned a #{res.class} and not a Net::HTTPResponse" \
-          unless res.is_a?(Net::HTTPResponse)
-
         class << res
-          attr_accessor :_uri, :_elapsed
+          attr_accessor :_uri, :_elapsed, :_proxy
           def _headers; each_header.inject({}) { |h, (k, v)| h[k] = v; h }; end
         end
         res._uri = uri.to_s
         res._elapsed = monow - t0
+        res._proxy = detail_proxy(http)
+
+        fail "request returned a #{res.class} and not a Net::HTTPResponse" \
+          unless res.is_a?(Net::HTTPResponse)
 
         res
       end
@@ -94,7 +95,8 @@ module Sentofu
           .merge!(
             _uri: res._uri,
             _headers: res._headers,
-            _elapsed: res._elapsed)
+            _elapsed: res._elapsed,
+            _proxy: res._proxy)
 
       rescue => err
 
@@ -141,6 +143,17 @@ module Sentofu
 
         OpenStruct.new(YAML.load(File.read(fname)))
       end
+
+      def detail_proxy(http)
+
+        if http.proxy_address
+          { address: http.proxy_address,
+            port: http.proxy_port,
+            user: http.proxy_user }
+        else
+          nil
+        end
+      end
     end
   end
 
@@ -150,6 +163,7 @@ module Sentofu
 
       @h = JSON.parse(res.body)
       @h[:_elapsed] = res._elapsed
+      @h[:_proxy] = res._proxy
 
       @expires_at = @h['expires_in'] ? Time.now + @h['expires_in'] : 0
     end
