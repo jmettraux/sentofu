@@ -17,6 +17,18 @@ describe Sentofu::Http do
       t = Sentofu::Http.fetch_token
 
       expect(t.class).to eq(Sentofu::Token)
+      expect(t.sound?).to eq(true)
+    end
+
+    it 'fails gracefully' do
+
+      t = Sentofu::Http.fetch_token(
+        id: 'xxxAPIClient', secret: 'NadaNada',
+        user: 'sentofuTestSentifiAPI', pass: 'NadaAgain')
+
+      expect(t.class).to eq(Sentofu::Token)
+      expect(t.header_value).to eq('Bearer SENTOFU_INVALID_TOKEN_:-(')
+      expect(t.sound?).to eq(false)
     end
   end
 
@@ -68,6 +80,19 @@ describe Sentofu::Http do
         ).to eq('application/json;charset=UTF-8')
 
       expect(h[:_elapsed]).to be_a(Float)
+    end
+
+    it 'fails gracefully' do
+
+      token = OpenStruct.new(
+        header_value: 'Bearer SENTOFU_TEST_PLEASE_IGNORE')
+
+      r = Sentofu::Http.get_and_parse(
+        'https://apis.sentifi.com/v1/intelligence/markets/events',
+        token)
+
+      expect(r[:code]).to eq(401)
+      expect(r[:headers].class).to eq(Hash)
     end
   end
 

@@ -150,7 +150,18 @@ module Sentofu
 
       @h = JSON.parse(res.body)
       @h[:_elapsed] = res._elapsed
-      @expires_at = Time.now + @h['expires_in']
+
+      @expires_at = @h['expires_in'] ? Time.now + @h['expires_in'] : 0
+    end
+
+    def errors
+
+      @h['errors'] || []
+    end
+
+    def sound?
+
+      errors.empty?
     end
 
     def not_expired?
@@ -160,7 +171,7 @@ module Sentofu
 
     def header_value
 
-      'Bearer ' + @h['access_token']
+      "Bearer #{@h['access_token'] || 'SENTOFU_INVALID_TOKEN_:-('}"
     end
   end
 end
