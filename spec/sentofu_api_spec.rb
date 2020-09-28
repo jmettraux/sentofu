@@ -141,9 +141,11 @@ describe Sentofu::Api do
           r = Sentofu.common.intelligence.markets.events
 
           expect(r.class
-            ).to eq(Hash)
+            ).to eq(
+              Hash)
           expect(r.keys
-            ).to eq([ 'data', 'extra', :_uri, :_headers, :_elapsed, :_proxy ])
+            ).to eq([
+              'data', 'extra', :_uri, :_headers, :_code, :_elapsed, :_proxy ])
 
           expect(r['data'].class).to eq(Array)
           expect(r['data'].map(&:keys).flatten.uniq.sort).to eq(%w[ id name ])

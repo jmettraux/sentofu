@@ -95,6 +95,7 @@ module Sentofu
           .merge!(
             _uri: res._uri,
             _headers: res._headers,
+            _code: res.code.to_i,
             _elapsed: res._elapsed,
             _proxy: res._proxy)
 
