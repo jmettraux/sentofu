@@ -15,7 +15,7 @@ require 'sentofu/explo'
 
 module Sentofu
 
-  VERSION = '0.5.5'
+  VERSION = '0.5.6'
 
   USER_AGENT =
     "Sentofu #{Sentofu::VERSION} - " +
