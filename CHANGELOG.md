@@ -2,7 +2,9 @@
 # CHANGELOG.md
 
 
-## sentofu 0.5.5  not yet released
+## sentofu 0.5.6  released 2020-09-28
+
+* Report _code along _headers in response
 
 
 ## sentofu 0.5.5  released 2020-09-25
