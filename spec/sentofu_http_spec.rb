@@ -40,10 +40,10 @@ describe Sentofu::Http do
         'https://apis.sentifi.com/v1/markets/events')
 
       expect(h[:uri]).to eq('https://apis.sentifi.com/v1/markets/events')
-      expect(h[:code]).to eq(404)
-      expect(h[:message]).to eq('Not Found')
+      expect(h[:code]).to eq(403)
+      expect(h[:message]).to eq('Forbidden')
       expect(h[:error_class]).to eq('RuntimeError')
-      expect(h[:error_message]).to match('something went wrong')
+      expect(h[:error_message]).to eq("Forbidden - #{h[:uri]}")
     end
 
     it 'returns a Hash with the data, _uri, _headers, and _elapsed' do
@@ -64,8 +64,8 @@ describe Sentofu::Http do
           Float)
 
       expect(h[:_headers]['content-type']
-        ).to eq(
-          'application/json;charset=UTF-8')
+        ).to match(
+          /^application\/json(;charset=UTF-8)?$/)
     end
 
     it 'grabs events' do
@@ -77,7 +77,7 @@ describe Sentofu::Http do
       expect(h[:_headers]
         ).to be_a(Hash)
       expect(h[:_headers]['content-type']
-        ).to eq('application/json;charset=UTF-8')
+        ).to match(/^application\/json(;charset=UTF-8)?$/)
 
       expect(h[:_elapsed]).to be_a(Float)
     end

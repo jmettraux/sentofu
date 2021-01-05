@@ -66,7 +66,7 @@ module Sentofu
         t0 = monow
 
         http = make_net_http(u)
-#t.set_debug_output($stdout) if u.to_s.match?(/search/)
+#http.set_debug_output($stdout) if uri.match?(/events/)
 
         res = http.request(req)
 
@@ -88,8 +88,10 @@ module Sentofu
 
         res = get(uri, token)
 
-        fail 'something went wrong' \
-          unless res.header['content-type'].match?(/^application\/json(;|$)/)
+        fail(
+          "#{WEBrick::HTTPStatus.reason_phrase(res.code) rescue ''} - " +
+          "#{res._uri}"
+        ) unless res.header['content-type'].match?(/^application\/json(;|$)/)
 
         JSON.parse(res.body)
           .merge!(
