@@ -13,19 +13,23 @@ module Sentofu
 
         a = Base64.encode64("#{cs.id}:#{cs.secret}").strip
 
-        req = Net::HTTP::Post.new(Sentofu.auth_uri)
+        u = URI(Sentofu.auth_uri)
+
+        req = Net::HTTP::Post.new(u.path)
         req.add_field('Content-Type', 'application/json')
         req.add_field('Authorization', a)
 
         req.body = JSON.dump(
           grant_type: 'password', username: cs.user, password: cs.pass)
 
-        Sentofu::Token.new(request(Sentofu.auth_uri, req))
+        Sentofu::Token.new(request(u, req))
       end
 
       def get(uri, token=nil)
 
-        request(uri, make_get_req(uri, token))
+        u = URI(uri)
+
+        request(u, make_get_req(u, token))
       end
 
       def make_net_http(uri)
@@ -61,12 +65,10 @@ module Sentofu
 
       def request(uri, req)
 
-        u = uri.is_a?(String) ? URI(uri) : uri
-
         t0 = monow
 
-        http = make_net_http(u)
-#http.set_debug_output($stdout) if uri.match?(/events/)
+        http = make_net_http(uri)
+#http.set_debug_output($stderr)
 
         res = http.request(req)
 
@@ -90,12 +92,12 @@ module Sentofu
 
         fail(
           "#{WEBrick::HTTPStatus.reason_phrase(res.code) rescue ''} - " +
-          "#{res._uri}"
+          "#{res._uri.to_s}"
         ) unless res.header['content-type'].match?(/^application\/json(;|$)/)
 
         JSON.parse(res.body)
           .merge!(
-            _uri: res._uri,
+            _uri: res._uri.to_s,
             _headers: res._headers,
             _code: res.code.to_i,
             _elapsed: res._elapsed,
@@ -103,7 +105,7 @@ module Sentofu
 
       rescue => err
 
-        { uri: uri,
+        { uri: uri.to_s,
           code: (res.code.to_i rescue nil),
           headers: (res._headers rescue nil),
           message: (WEBrick::HTTPStatus.reason_phrase(res.code) rescue nil),
@@ -119,7 +121,10 @@ module Sentofu
 
       def make_get_req(uri, token)
 
-        req = Net::HTTP::Get.new(uri.to_s)
+        u = [ uri.path, uri.query ].compact.join('?')
+        u = '/' if u.length < 1
+
+        req = Net::HTTP::Get.new(u)
         req.instance_eval { @header.clear }
         def req.set_header(k, v); @header[k] = [ v ]; end
 
