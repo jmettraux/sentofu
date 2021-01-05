@@ -2,7 +2,10 @@
 # CHANGELOG.md
 
 
-## sentofu 0.6.0  not yet released
+## sentofu 0.6.0  released 2021-01-05
+
+* Make error messages more informative
+* Stop passing the full URI to GET and POST
 
 
 ## sentofu 0.5.6  released 2020-09-28
